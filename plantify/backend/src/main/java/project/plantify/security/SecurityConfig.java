@@ -1,18 +1,30 @@
 package project.plantify.security;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
+
+    private final SupabaseJwtAuthFilter supabaseJwtAuthFilter;
+
+    public SecurityConfig(SupabaseJwtAuthFilter supabaseJwtAuthFilter) {
+        this.supabaseJwtAuthFilter = supabaseJwtAuthFilter;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable()) // Wyłączenie CSRF dla testów
+        http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // Zezwolenie na wszystkie requesty bez logowania
-                );
+                        .requestMatchers("/api/plantify").authenticated() // Zabezpieczony endpoint
+                        .anyRequest().permitAll() // Pozwól na inne żądania
+                )
+                .addFilterBefore(supabaseJwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // Dodaj nasz filtr przed standardowym filtrem
         return http.build();
     }
 }

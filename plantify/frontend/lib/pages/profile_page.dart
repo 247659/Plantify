@@ -18,6 +18,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final email = authSerivce.getCurrentUserEmail();
+    final accessToken = authSerivce.getCurrentUserAccessToken();
 
     return Scaffold(
       appBar: AppBar(title: const Text("Profile"),
@@ -26,8 +27,15 @@ class _ProfilePageState extends State<ProfilePage> {
         )),
       ],
     ),
+    body: ListView(
+      children: [
+        Center(child: Text(email.toString())),
 
-    body: Center(child: Text(email.toString())),
+        const SizedBox(height: 12),
+
+        Center(child: Text(accessToken.toString()),)
+      ],
+    )
     );
   }
 }
