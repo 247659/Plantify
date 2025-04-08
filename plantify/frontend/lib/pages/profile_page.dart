@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/auth/auth_serivce.dart';
+import 'package:frontend/pages/plant_add_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -10,7 +11,6 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final authSerivce = AuthSerivce();
-
   void logout() async {
     await authSerivce.signOut();
   }
@@ -24,6 +24,15 @@ class _ProfilePageState extends State<ProfilePage> {
       actions: [
         IconButton(onPressed: logout, icon: const Icon(Icons.logout
         )),
+        IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const PlantAddPage()),
+            );
+          },
+        ),
       ],
     ),
 
