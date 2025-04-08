@@ -34,7 +34,6 @@ class _PlantAddPageState extends State<PlantAddPage>{
           'location': location,
           'photo_url': null,
           'species': species,
-          'owner_id': _supabase.auth.currentUser?.id,
           });
 
         ScaffoldMessenger.of(context).showSnackBar(
