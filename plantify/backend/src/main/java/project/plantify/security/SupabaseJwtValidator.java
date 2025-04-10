@@ -9,7 +9,8 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class SupabaseJwtValidator {
 
-    private String secret = "WgcMITsQCp0jy850hLGhgzaD3hCQmQ79nTRf0ErHFBaYaG8tn3CWTiD3smvshOkNyMs6qnEpXKnjGtKWHb57CA==";
+    @Value("${supabase.jwt.secret}")
+    private String secret;
 
     public boolean validateToken(String token) {
         try {

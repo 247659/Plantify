@@ -27,4 +27,16 @@ public class SecurityConfig {
                 .addFilterBefore(supabaseJwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // Dodaj nasz filtr przed standardowym filtrem
         return http.build();
     }
+
+
+    //bez tokenu
+//    @Bean
+//    public SecurityFilterChain unsecureFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(csrf -> csrf.disable()) // Wyłączenie CSRF dla testów
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/test").anonymous().anyRequest().permitAll() // Zezwolenie na wszystkie requesty bez logowania
+//                );
+//        return http.build();
+//    }
 }
