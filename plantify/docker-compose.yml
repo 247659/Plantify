@@ -1,0 +1,24 @@
+services:
+  backend:
+    container_name: plantify-backend-container
+    build:
+      context: ./backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
+
+  frontend:
+    container_name: plantify-frontend-container
+    build:
+      context: ./frontend/frontend-v1j2ba
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./frontend/frontend-v1j2ba/.env
+    volumes:
+      - ./frontend/frontend-v1j2ba/lib:/app/lib
+    restart: unless-stopped
