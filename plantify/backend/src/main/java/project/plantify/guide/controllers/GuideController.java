@@ -5,8 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.plantify.guide.playloads.request.FindSpeciesRequest;
-import project.plantify.guide.playloads.response.PlantsResponse;
-import project.plantify.guide.playloads.response.PlantsResponseToFrontend;
+import project.plantify.guide.playloads.response.*;
 import project.plantify.guide.services.GuideService;
 
 import java.util.List;
@@ -27,17 +26,38 @@ public class GuideController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/getPlantsBySpecies")
-    public ResponseEntity<List<PlantsResponseToFrontend>> getAllPlantsBySpecies(@RequestBody FindSpeciesRequest req) {
-        String species = req.getSpecies();
+    @GetMapping("/getPlantsBySpecies")
+    public ResponseEntity<List<PlantsResponseToFrontend>> getAllPlantsBySpecies(@RequestParam("species") String species) {
         List<PlantsResponseToFrontend> response = this.guideService.getAllPlantsBySpecies(species);
         System.out.println(response);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/getSinglePlant")
-    public ResponseEntity<PlantsResponseToFrontend> getSinglePlant(@RequestParam("id") String id) {
-        PlantsResponseToFrontend response = this.guideService.getSinglePlant(id);
+    public ResponseEntity<SinglePlantResponseToFrontend> getSinglePlant(@RequestParam("id") String id) {
+        SinglePlantResponseToFrontend response = this.guideService.getSinglePlant(id);
+        System.out.println(response);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getPlantsGuide")
+    public ResponseEntity<List<PlantsGuideFrontendResponse>> getPlantsGuide(@RequestParam("name") String name) {
+        List<PlantsGuideFrontendResponse> response = this.guideService.getPlantsGuide(name);
+        System.out.println(response);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getPlantsGuideById")
+    public ResponseEntity<PlantsGuideFrontendResponse> getPlantsGuideById(@RequestParam("speciesId") String id,
+                                                                          @RequestParam("speciesName") String name) {
+        PlantsGuideFrontendResponse response = this.guideService.getPlantsGuideById(id, name);
+        System.out.println(response);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getPlantsFAQ")
+    public ResponseEntity<List<PlantsFAQFrontendResponse>> getPlantsFAQ(@RequestParam("name") String name) {
+        List<PlantsFAQFrontendResponse> response = this.guideService.getPlantsFAQ(name);
         System.out.println(response);
         return ResponseEntity.ok(response);
     }
