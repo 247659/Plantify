@@ -26,9 +26,8 @@ public class GuideController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/getPlantsBySpecies")
-    public ResponseEntity<List<PlantsResponseToFrontend>> getAllPlantsBySpecies(@RequestBody FindSpeciesRequest req) {
-        String species = req.getSpecies();
+    @GetMapping("/getPlantsBySpecies")
+    public ResponseEntity<List<PlantsResponseToFrontend>> getAllPlantsBySpecies(@RequestParam("species") String species) {
         List<PlantsResponseToFrontend> response = this.guideService.getAllPlantsBySpecies(species);
         System.out.println(response);
         return ResponseEntity.ok(response);
@@ -52,6 +51,13 @@ public class GuideController {
     public ResponseEntity<PlantsGuideFrontendResponse> getPlantsGuideById(@RequestParam("speciesId") String id,
                                                                           @RequestParam("speciesName") String name) {
         PlantsGuideFrontendResponse response = this.guideService.getPlantsGuideById(id, name);
+        System.out.println(response);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getPlantsFAQ")
+    public ResponseEntity<List<PlantsFAQFrontendResponse>> getPlantsFAQ(@RequestParam("name") String name) {
+        List<PlantsFAQFrontendResponse> response = this.guideService.getPlantsFAQ(name);
         System.out.println(response);
         return ResponseEntity.ok(response);
     }

@@ -83,6 +83,32 @@ public class GuideService {
         return guidesResponse.orElse(null);
     }
 
+    public List<PlantsFAQFrontendResponse> getPlantsFAQ(String name) {
+        PlantsFAQResponse plantsFAQ = webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/article-faq-list")
+                        .queryParam("key", apiToken)
+                        .queryParam("q", name)
+                        .build())
+                .retrieve()
+                .bodyToMono(PlantsFAQResponse.class)
+                .block();
+
+        return preparePlantsFAQForFrontend(Objects.requireNonNull(plantsFAQ).getData());
+    }
+
+    private List<PlantsFAQFrontendResponse> preparePlantsFAQForFrontend(List<PlantsFAQResponse.Data> data) {
+        List<PlantsFAQFrontendResponse> plantsFAQResponseToFrontends = new ArrayList<>();
+        for (PlantsFAQResponse.Data faq : data) {
+            PlantsFAQFrontendResponse faqResponse = new PlantsFAQFrontendResponse();
+            faqResponse.setId(faq.getId());
+            faqResponse.setQuestion(faq.getQuestion());
+            faqResponse.setAnswer(faq.getAnswer());
+            plantsFAQResponseToFrontends.add(faqResponse);
+        }
+        return plantsFAQResponseToFrontends;
+    }
+
     private List<PlantsGuideFrontendResponse> preparePlantsGuideForFrontend(List<PlantsGuideResponse.PlantData> guides) {
         List<PlantsGuideFrontendResponse> plantsGuideResponseToFrontends = new ArrayList<>();
         for (PlantsGuideResponse.PlantData guide : guides) {
