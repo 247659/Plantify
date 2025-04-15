@@ -5,8 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.plantify.guide.playloads.request.FindSpeciesRequest;
-import project.plantify.guide.playloads.response.PlantsResponse;
-import project.plantify.guide.playloads.response.PlantsResponseToFrontend;
+import project.plantify.guide.playloads.response.*;
 import project.plantify.guide.services.GuideService;
 
 import java.util.List;
@@ -36,8 +35,23 @@ public class GuideController {
     }
 
     @GetMapping("/getSinglePlant")
-    public ResponseEntity<PlantsResponseToFrontend> getSinglePlant(@RequestParam("id") String id) {
-        PlantsResponseToFrontend response = this.guideService.getSinglePlant(id);
+    public ResponseEntity<SinglePlantResponseToFrontend> getSinglePlant(@RequestParam("id") String id) {
+        SinglePlantResponseToFrontend response = this.guideService.getSinglePlant(id);
+        System.out.println(response);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getPlantsGuide")
+    public ResponseEntity<List<PlantsGuideFrontendResponse>> getPlantsGuide(@RequestParam("name") String name) {
+        List<PlantsGuideFrontendResponse> response = this.guideService.getPlantsGuide(name);
+        System.out.println(response);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getPlantsGuideById")
+    public ResponseEntity<PlantsGuideFrontendResponse> getPlantsGuideById(@RequestParam("speciesId") String id,
+                                                                          @RequestParam("speciesName") String name) {
+        PlantsGuideFrontendResponse response = this.guideService.getPlantsGuideById(id, name);
         System.out.println(response);
         return ResponseEntity.ok(response);
     }

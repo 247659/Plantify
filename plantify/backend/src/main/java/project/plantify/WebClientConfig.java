@@ -8,6 +8,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
     @Bean
     public WebClient webClient() {
-        return WebClient.builder().baseUrl("https://perenual.com/api/v2").build();
+        return WebClient.builder().baseUrl("https://perenual.com/api").build();
     }
 }
