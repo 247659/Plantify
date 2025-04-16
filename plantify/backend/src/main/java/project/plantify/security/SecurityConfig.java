@@ -2,6 +2,7 @@ package project.plantify.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -19,24 +20,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/plantify").authenticated() // Zabezpieczony endpoint
-                        .anyRequest().permitAll() // Pozwól na inne żądania
+                        .anyRequest().authenticated()
+//                                .anyRequest().permitAll()
                 )
                 .addFilterBefore(supabaseJwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // Dodaj nasz filtr przed standardowym filtrem
         return http.build();
     }
 
-
-    //bez tokenu
-//    @Bean
-//    public SecurityFilterChain unsecureFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(csrf -> csrf.disable()) // Wyłączenie CSRF dla testów
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/test").anonymous().anyRequest().permitAll() // Zezwolenie na wszystkie requesty bez logowania
-//                );
-//        return http.build();
-//    }
 }

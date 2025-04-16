@@ -2,13 +2,19 @@ package project.plantify.guide.controllers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Role;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.plantify.guide.playloads.request.FindSpeciesRequest;
 import project.plantify.guide.playloads.response.*;
 import project.plantify.guide.services.GuideService;
 
+import java.io.IOException;
 import java.util.List;
+
+import static org.springframework.security.authorization.AuthorityReactiveAuthorizationManager.hasRole;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -61,4 +67,5 @@ public class GuideController {
         System.out.println(response);
         return ResponseEntity.ok(response);
     }
+
 }

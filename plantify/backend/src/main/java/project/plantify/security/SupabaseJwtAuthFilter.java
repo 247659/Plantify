@@ -36,7 +36,6 @@ public class SupabaseJwtAuthFilter extends OncePerRequestFilter {
             if (jwtValidator.validateToken(token)) {
                 // Uzyskujemy Claims z tokena (np. Subject)
                 Claims claims = jwtValidator.getClaims(token);
-                System.out.println("[FILTER] Claims: " + claims);
                 String userId = claims.getSubject(); // Możesz także dodać inne dane z tokena, jak email, role itd.
 
                 // Tworzymy token autoryzacyjny
@@ -50,11 +49,12 @@ public class SupabaseJwtAuthFilter extends OncePerRequestFilter {
                 response.getWriter().write("Invalid JWT token");
                 return; // Zatrzymujemy przetwarzanie, bo token jest niepoprawny
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Missing or invalid Authorization header");
-            return; // Zatrzymujemy przetwarzanie, bo nagłówek jest niepoprawny
         }
+//        else {
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            response.getWriter().write("Missing or invalid Authorization header");
+//            return; // Zatrzymujemy przetwarzanie, bo nagłówek jest niepoprawny
+//        }
 
         // Przechodzimy do kolejnego filtra w łańcuchu
         filterChain.doFilter(request, response);

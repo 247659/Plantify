@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import project.plantify.guide.playloads.response.*;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -45,6 +49,7 @@ public class GuideService {
                 .bodyToMono(PlantsResponse.class)
                 .block();
 
+        List<PlantsResponseToFrontend> plantsResponseToFrontends = preparePlantsForFronted(Objects.requireNonNull(plants).getData());
         return preparePlantsForFronted(Objects.requireNonNull(plants).getData());
     }
 

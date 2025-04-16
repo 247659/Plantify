@@ -8,7 +8,6 @@ import project.plantify.AI.payloads.request.PhotoRequest;
 import project.plantify.AI.payloads.response.PhotoAnalysisResponse;
 import project.plantify.AI.payloads.response.PhotoAnalysisResponseToFrontend;
 import project.plantify.AI.services.AIService;
-import project.plantify.guide.services.GuideService;
 
 import java.util.List;
 
@@ -20,11 +19,12 @@ public class AIController {
     @Autowired
     private AIService aiService;
 
-    @PostMapping("/getSpecies")
-    public ResponseEntity<PhotoAnalysisResponseToFrontend> getSpecies(@ModelAttribute PhotoRequest request) {
-        System.out.println(request);
-        PhotoAnalysisResponseToFrontend response = this.aiService.analyzePhoto(request);
-        return ResponseEntity.ok(response);
+    @PostMapping(value = "/getSpecies")
+    public ResponseEntity<PhotoAnalysisResponseToFrontend> getSpecies(@RequestPart("images") List<MultipartFile> images,
+                                                                      @RequestPart("data") PhotoRequest request) {
+        PhotoAnalysisResponse response = this.aiService.analyzePhoto(images, request);
+        PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(response.getBestMatch(), response.getResults());
+        return ResponseEntity.ok(frontendResponse);
     }
 
 }
