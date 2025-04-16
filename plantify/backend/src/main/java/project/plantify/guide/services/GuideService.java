@@ -2,6 +2,7 @@ package project.plantify.guide.services;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public class GuideService {
 
     @Autowired
+    @Qualifier("Guide")
     private WebClient webClient;
 
     @Value("${plant.api.token}")
