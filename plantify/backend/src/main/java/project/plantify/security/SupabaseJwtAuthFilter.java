@@ -50,6 +50,10 @@ public class SupabaseJwtAuthFilter extends OncePerRequestFilter {
                 response.getWriter().write("Invalid JWT token");
                 return; // Zatrzymujemy przetwarzanie, bo token jest niepoprawny
             }
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Missing or invalid Authorization header");
+            return; // Zatrzymujemy przetwarzanie, bo nagłówek jest niepoprawny
         }
 
         // Przechodzimy do kolejnego filtra w łańcuchu
