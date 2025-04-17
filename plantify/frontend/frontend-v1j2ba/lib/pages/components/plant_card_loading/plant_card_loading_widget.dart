@@ -33,6 +33,8 @@ class _PlantCardLoadingWidgetState extends State<PlantCardLoadingWidget> {
 
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {});
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
   }
 
   @override

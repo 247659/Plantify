@@ -21,8 +21,10 @@ public class AIController {
 
     @PostMapping(value = "/getSpecies")
     public ResponseEntity<PhotoAnalysisResponseToFrontend> getSpecies(@RequestPart("images") List<MultipartFile> images,
-                                                                      @RequestPart("data") PhotoRequest request) {
-        PhotoAnalysisResponse response = this.aiService.analyzePhoto(images, request);
+                                                                      @RequestPart("organs") String organs,
+                                                                      @RequestPart("lang") String lang,
+                                                                      @RequestPart("nbresults") String nbresults) {
+        PhotoAnalysisResponse response = this.aiService.analyzePhoto(images, organs, lang, nbresults);
         PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(response.getBestMatch(), response.getResults());
         return ResponseEntity.ok(frontendResponse);
     }

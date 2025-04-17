@@ -23,8 +23,8 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/plantify").authenticated() // Zabezpieczony endpoint
-                        .anyRequest().authenticated()
-//                                .anyRequest().permitAll()
+//                        .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 )
                 .addFilterBefore(supabaseJwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // Dodaj nasz filtr przed standardowym filtrem
         return http.build();
