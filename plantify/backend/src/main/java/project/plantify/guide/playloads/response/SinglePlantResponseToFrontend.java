@@ -21,7 +21,7 @@ public class SinglePlantResponseToFrontend {
     private List<PlantPart> plantAnatomy;
     private List<String> sunlight;
     private List<String> pruningMonth;
-    private PruningCount pruningCount;
+    private List<PruningCount> pruningCount;
     private String seeds;
     private List<String> propagation;
     private boolean flowers;

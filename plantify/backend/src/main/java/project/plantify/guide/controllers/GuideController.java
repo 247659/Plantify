@@ -34,7 +34,7 @@ public class GuideController {
 
     @GetMapping("/getPlantsBySpecies")
     public ResponseEntity<List<PlantsResponseToFrontend>> getAllPlantsBySpecies(@RequestParam("species") String species) {
-        List<PlantsResponseToFrontend> response = this.guideService.getAllPlantsBySpecies(species);
+        List<PlantsResponseToFrontend> response = this.guideService.getAllPlantsBySpecies(species.toLowerCase());
         System.out.println(response);
         return ResponseEntity.ok(response);
     }
@@ -48,7 +48,7 @@ public class GuideController {
 
     @GetMapping("/getPlantsGuide")
     public ResponseEntity<List<PlantsGuideFrontendResponse>> getPlantsGuide(@RequestParam("name") String name) {
-        List<PlantsGuideFrontendResponse> response = this.guideService.getPlantsGuide(name);
+        List<PlantsGuideFrontendResponse> response = this.guideService.getPlantsGuide(name.toLowerCase());
         System.out.println(response);
         return ResponseEntity.ok(response);
     }
@@ -56,14 +56,14 @@ public class GuideController {
     @GetMapping("/getPlantsGuideById")
     public ResponseEntity<PlantsGuideFrontendResponse> getPlantsGuideById(@RequestParam("speciesId") String id,
                                                                           @RequestParam("speciesName") String name) {
-        PlantsGuideFrontendResponse response = this.guideService.getPlantsGuideById(id, name);
+        PlantsGuideFrontendResponse response = this.guideService.getPlantsGuideById(id, name.toLowerCase());
         System.out.println(response);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/getPlantsFAQ")
     public ResponseEntity<List<PlantsFAQFrontendResponse>> getPlantsFAQ(@RequestParam("name") String name) {
-        List<PlantsFAQFrontendResponse> response = this.guideService.getPlantsFAQ(name);
+        List<PlantsFAQFrontendResponse> response = this.guideService.getPlantsFAQ(name.toLowerCase());
         System.out.println(response);
         return ResponseEntity.ok(response);
     }

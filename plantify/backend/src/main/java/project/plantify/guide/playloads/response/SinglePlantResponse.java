@@ -80,7 +80,7 @@ public class SinglePlantResponse {
     private List<String> pruningMonth;
 
     @JsonProperty("pruning_count")
-    private PruningCount pruningCount;
+    private List<PruningCount> pruningCount;
 
     @Getter
     @Setter
