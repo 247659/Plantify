@@ -50,6 +50,8 @@ class _CustomAppbarWidgetState extends State<CustomAppbarWidget> {
 
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {});
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
   }
 
   @override

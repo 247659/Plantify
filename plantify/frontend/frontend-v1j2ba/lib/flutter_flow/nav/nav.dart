@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
+import '/backend/schema/structs/index.dart';
+
 import '/backend/supabase/supabase.dart';
 
 import '/auth/base_auth_user_provider.dart';
@@ -110,6 +112,7 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: ProfileWidget.routeName,
           path: ProfileWidget.routePath,
+          requireAuth: true,
           builder: (context, params) => params.isEmpty
               ? NavBarPage(initialPage: 'Profile')
               : ProfileWidget(),
@@ -117,6 +120,7 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: DashboardWidget.routeName,
           path: DashboardWidget.routePath,
+          requireAuth: true,
           builder: (context, params) => params.isEmpty
               ? NavBarPage(initialPage: 'Dashboard')
               : DashboardWidget(),
@@ -129,6 +133,7 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: PlantDetailsWidget.routeName,
           path: PlantDetailsWidget.routePath,
+          requireAuth: true,
           builder: (context, params) => PlantDetailsWidget(
             plant: params.getParam<PlantsRow>(
               'plant',
@@ -139,11 +144,13 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: AboutAsWidget.routeName,
           path: AboutAsWidget.routePath,
+          requireAuth: true,
           builder: (context, params) => AboutAsWidget(),
         ),
         FFRoute(
           name: CreatePlantWidget.routeName,
           path: CreatePlantWidget.routePath,
+          requireAuth: true,
           builder: (context, params) => CreatePlantWidget(
             addImageURL: params.getParam(
               'addImageURL',
@@ -154,9 +161,41 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: GuidePageWidget.routeName,
           path: GuidePageWidget.routePath,
+          requireAuth: true,
           builder: (context, params) => params.isEmpty
               ? NavBarPage(initialPage: 'GuidePage')
               : GuidePageWidget(),
+        ),
+        FFRoute(
+          name: EditProfileWidget.routeName,
+          path: EditProfileWidget.routePath,
+          requireAuth: true,
+          builder: (context, params) => EditProfileWidget(),
+        ),
+        FFRoute(
+          name: SettingsWidget.routeName,
+          path: SettingsWidget.routePath,
+          requireAuth: true,
+          builder: (context, params) => SettingsWidget(),
+        ),
+        FFRoute(
+          name: SinglePlantGuideWidget.routeName,
+          path: SinglePlantGuideWidget.routePath,
+          builder: (context, params) => SinglePlantGuideWidget(),
+        ),
+        FFRoute(
+          name: SinglePlantGuidePageWidget.routeName,
+          path: SinglePlantGuidePageWidget.routePath,
+          builder: (context, params) => SinglePlantGuidePageWidget(
+            id: params.getParam(
+              'id',
+              ParamType.String,
+            ),
+            originalUrl: params.getParam(
+              'originalUrl',
+              ParamType.String,
+            ),
+          ),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
@@ -275,6 +314,7 @@ class FFParameters {
     String paramName,
     ParamType type, {
     bool isList = false,
+    StructBuilder<T>? structBuilder,
   }) {
     if (futureParamValues.containsKey(paramName)) {
       return futureParamValues[paramName];
@@ -292,6 +332,7 @@ class FFParameters {
       param,
       type,
       isList,
+      structBuilder: structBuilder,
     );
   }
 }

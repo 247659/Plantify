@@ -40,6 +40,8 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget> {
 
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {});
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
   }
 
   @override
@@ -61,7 +63,6 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget> {
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              widget!.icon!,
               Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(0.0, 32.0, 0.0, 0.0),
                 child: Text(

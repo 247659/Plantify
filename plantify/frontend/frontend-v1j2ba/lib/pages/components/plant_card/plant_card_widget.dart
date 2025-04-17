@@ -35,6 +35,8 @@ class _PlantCardWidgetState extends State<PlantCardWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => PlantCardModel());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
   }
 
   @override
@@ -111,7 +113,7 @@ class _PlantCardWidgetState extends State<PlantCardWidget> {
             ),
           ),
           Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 0.0, 0.0),
+            padding: EdgeInsetsDirectional.fromSTEB(8.0, 12.0, 0.0, 0.0),
             child: Text(
               valueOrDefault<String>(
                 widget!.plantRef?.name,
@@ -131,7 +133,7 @@ class _PlantCardWidgetState extends State<PlantCardWidget> {
             padding: EdgeInsetsDirectional.fromSTEB(0.0, 6.0, 0.0, 0.0),
             child: Container(
               decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).accent1,
+                color: FlutterFlowTheme.of(context).primary,
                 borderRadius: BorderRadius.circular(24.0),
               ),
               child: Padding(
@@ -148,7 +150,7 @@ class _PlantCardWidgetState extends State<PlantCardWidget> {
                         ),
                         style: FlutterFlowTheme.of(context).bodyMedium.override(
                               fontFamily: 'Inter',
-                              color: FlutterFlowTheme.of(context).primary,
+                              color: FlutterFlowTheme.of(context).primaryText,
                               fontSize: 10.0,
                               letterSpacing: 0.0,
                               fontWeight: FontWeight.w500,
