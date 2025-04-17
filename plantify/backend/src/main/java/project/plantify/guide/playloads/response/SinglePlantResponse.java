@@ -1,8 +1,10 @@
 package project.plantify.guide.playloads.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.Setter;
+import project.plantify.guide.services.PruningCountDeserializer;
 
 import java.util.List;
 
@@ -80,6 +82,7 @@ public class SinglePlantResponse {
     private List<String> pruningMonth;
 
     @JsonProperty("pruning_count")
+    @JsonDeserialize(using = PruningCountDeserializer.class)
     private List<PruningCount> pruningCount;
 
     @Getter

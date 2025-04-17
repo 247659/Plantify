@@ -75,44 +75,8 @@ public class GuideService {
                 .bodyToMono(SinglePlantResponse.class)
                 .block();
 
-        System.out.println("CHECK");
-        SinglePlantResponseToFrontend plantResponse = prepareSinglePlantForFronted(Objects.requireNonNull(plant));
         System.out.println("CHECK2");
-        return checkNull(plantResponse);
-    }
-
-    private SinglePlantResponseToFrontend checkNull(SinglePlantResponseToFrontend plant) {
-//        if (plant.getDimensions() == null || plant.getDimensions().isEmpty()) {
-//            SinglePlantResponseToFrontend.Dimensions dimensions = new SinglePlantResponseToFrontend.Dimensions();
-//            dimensions.setType("Unknown");
-//            dimensions.setMinValue("Unknown");
-//            dimensions.setMaxValue("Unknown");
-//            dimensions.setUnit("Unknown");
-//            plant.getDimensions().add(dimensions);
-//        }
-//        if (plant.getWateringGeneralBenchmark() == null) {
-//            plant.setWateringGeneralBenchmark(new SinglePlantResponseToFrontend.WateringBenchmark());
-//            plant.getWateringGeneralBenchmark().setUnit("Unknown");
-//            plant.getWateringGeneralBenchmark().setValue("Unknown");
-//        }
-//        if (plant.getPruningCount() == null || plant.getPruningCount().isEmpty()) {
-//            SinglePlantResponseToFrontend.PruningCount pruningCount = new SinglePlantResponseToFrontend.PruningCount();
-//            pruningCount.setAmount(0);
-//            pruningCount.setInterval("Unknown");
-//            plant.getPruningCount().add(pruningCount);
-//        }
-//        if (plant.getPlantAnatomy() == null || plant.getPlantAnatomy().isEmpty()) {
-//            SinglePlantResponseToFrontend.PlantPart plantPart = new SinglePlantResponseToFrontend.PlantPart();
-//            plantPart.setPart("Unknown");
-//            plantPart.getColor().add("Unknown");
-//            plant.getPlantAnatomy().add(plantPart);
-//        }
-
-        if (plant.getOriginalUrl() == null || plant.getOriginalUrl().isEmpty() || plant.getOriginalUrl().contains("upgrade_access.jpg")) {
-            plant.setOriginalUrl("https://images.unsplash.com/photo-1512428813834-c702c7702b78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxMXx8cGxhbnR8ZW58MHx8fHwxNzQ0MTMxOTgxfDA&ixlib=rb-4.0.3&q=80&w=1080");
-        }
-
-        return plant;
+        return prepareSinglePlantForFronted(Objects.requireNonNull(plant));
     }
 
     public List<PlantsGuideFrontendResponse> getPlantsGuide(String name) {
@@ -199,9 +163,16 @@ public class GuideService {
         plantResponse.setFamily(plant.getFamily());
         plantResponse.setType(plant.getType());
 
-        if (plant.getDimensions() == null || plant.getDimensions().isEmpty()) {
-            plantResponse.setDimensions(null);
-        } else {
+//        if (plant.getDimensions() == null || plant.getDimensions().isEmpty()) {
+//            List<SinglePlantResponseToFrontend.Dimensions> newDimensions = new ArrayList<>();
+//            SinglePlantResponseToFrontend.Dimensions dimension = new SinglePlantResponseToFrontend.Dimensions();
+//            dimension.setType("Unknown");
+//            dimension.setMinValue("Unknown");
+//            dimension.setMaxValue("Unknown");
+//            dimension.setUnit("Unknown");
+//            plantResponse.setDimensions(newDimensions);
+//            plantResponse.getDimensions().add(dimension);
+//        } else {
             List<SinglePlantResponseToFrontend.Dimensions> frontendDimensions = plant.getDimensions().stream()
                     .map(d -> {
                         SinglePlantResponseToFrontend.Dimensions fd = new SinglePlantResponseToFrontend.Dimensions();
@@ -213,25 +184,30 @@ public class GuideService {
                     })
                     .collect(Collectors.toList());
             plantResponse.setDimensions(frontendDimensions);
-        }
-
+//        }
 
         plantResponse.setCycle(plant.getCycle());
         plantResponse.setWatering(plant.getWatering());
 
-        if (plant.getWateringGeneralBenchmark() == null) {
-            plantResponse.setWateringGeneralBenchmark(null);
-        } else {
+//        if (plant.getWateringGeneralBenchmark() == null) {
+//            plantResponse.setWateringGeneralBenchmark(new SinglePlantResponseToFrontend.WateringBenchmark());
+//            plantResponse.getWateringGeneralBenchmark().setUnit("Unknown");
+//            plantResponse.getWateringGeneralBenchmark().setValue("Unknown");
+//        } else {
             SinglePlantResponseToFrontend.WateringBenchmark wateringBenchmark = new SinglePlantResponseToFrontend.WateringBenchmark();
             wateringBenchmark.setUnit(plant.getWateringGeneralBenchmark().getUnit());
             wateringBenchmark.setValue(plant.getWateringGeneralBenchmark().getValue());
             plantResponse.setWateringGeneralBenchmark(wateringBenchmark);
-        }
+//        }
 
-        if (plant.getPlantAnatomy() == null || plant.getPlantAnatomy().isEmpty()) {
-            plantResponse.setPlantAnatomy(null);
-        }
-        else {
+//        if (plant.getPlantAnatomy() == null || plant.getPlantAnatomy().isEmpty()) {
+//            List<SinglePlantResponseToFrontend.PlantPart> newParts = new ArrayList<>();
+//            SinglePlantResponseToFrontend.PlantPart plantPart = new SinglePlantResponseToFrontend.PlantPart();
+//            plantPart.setPart("Unknown");
+//            plantPart.getColor().add("Unknown");
+//            plantResponse.setPlantAnatomy(newParts);
+//            plantResponse.getPlantAnatomy().add(plantPart);
+//        } else {
             List<SinglePlantResponseToFrontend.PlantPart> plantAnatomy = plant.getPlantAnatomy().stream()
                     .map(pa -> {
                         SinglePlantResponseToFrontend.PlantPart part = new SinglePlantResponseToFrontend.PlantPart();
@@ -241,26 +217,32 @@ public class GuideService {
                     })
                     .collect(Collectors.toList());
             plantResponse.setPlantAnatomy(plantAnatomy);
-        }
+//        }
 
         plantResponse.setSunlight(plant.getSunlight());
         plantResponse.setPruningMonth(plant.getPruningMonth());
 
-        System.out.println("HALOO");
-        if (plant.getPruningCount() == null || plant.getPruningCount().isEmpty()) {
-            plantResponse.setPruningCount(null);
-        } else {
-            List<SinglePlantResponseToFrontend.PruningCount> pruningCounts = plant.getPruningCount().stream()
-                    .map(pc -> {
-                        SinglePlantResponseToFrontend.PruningCount pcResponse = new SinglePlantResponseToFrontend.PruningCount();
-                        pcResponse.setAmount(pc.getAmount());
-                        pcResponse.setInterval(pc.getInterval());
-                        return pcResponse;
+        System.out.println("-------------");
+        System.out.println(plant.getPruningCount());
+        System.out.println("-------------");
+//        if (plant.getPruningCount() == null) {
+//            List<SinglePlantResponseToFrontend.PruningCount> newPruningCount = new ArrayList<>();
+//            SinglePlantResponseToFrontend.PruningCount pruningCount = new SinglePlantResponseToFrontend.PruningCount();
+//            pruningCount.setInterval("Unknown");
+//            pruningCount.setAmount(0);
+//            plantResponse.setPruningCount(newPruningCount);
+//            plantResponse.getPruningCount().add(pruningCount);
+//        } else {
+            List<SinglePlantResponseToFrontend.PruningCount> plantPruningCount = plant.getPruningCount().stream()
+                    .map(pa -> {
+                        SinglePlantResponseToFrontend.PruningCount count = new SinglePlantResponseToFrontend.PruningCount();
+                        count.setAmount(pa.getAmount());
+                        count.setInterval(pa.getInterval());
+                        return count;
                     })
                     .collect(Collectors.toList());
-            plantResponse.setPruningCount(pruningCounts);
-        }
-
+            plantResponse.setPruningCount(plantPruningCount);
+//        }
 
         plantResponse.setSeeds(plant.getSeeds());
         plantResponse.setPropagation(plant.getPropagation());
@@ -291,12 +273,12 @@ public class GuideService {
         plantResponse.setIndoor(plant.getIndoor());
         plantResponse.setCareLevel(plant.getCareLevel());
         plantResponse.setDescription(plant.getDescription());
-        if (plant.getDefaultImage() != null) {
-            plantResponse.setOriginalUrl(plant.getDefaultImage().getOriginalUrl());
-        } else {
-            plantResponse.setOriginalUrl(null);
-        }
 
+        if (plant.getDefaultImage() == null || plant.getDefaultImage().getOriginalUrl().contains("upgrade_access.jpg")) {
+            plantResponse.setOriginalUrl("https://images.unsplash.com/photo-1512428813834-c702c7702b78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxMXx8cGxhbnR8ZW58MHx8fHwxNzQ0MTMxOTgxfDA&ixlib=rb-4.0.3&q=80&w=1080");
+        } else {
+            plantResponse.setOriginalUrl(plant.getDefaultImage().getOriginalUrl());
+        }
 
         return plantResponse;
     }
