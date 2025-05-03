@@ -167,4 +167,21 @@ class GuideControllerTest {
                 .andExpect(jsonPath("$.id", is(Integer.valueOf(plantId))))
                 .andExpect(jsonPath("$.commonName", is("sedge")));
     }
+
+    @Test
+    void getInternalServerError() throws Exception {
+        String plantId = "1668";
+
+        wireMockServer.stubFor(WireMock.get(WireMock.urlPathEqualTo("/v2/species/details/" + plantId))
+                        .withQueryParam("key", WireMock.matching(".*"))
+                .willReturn(aResponse().withStatus(500)));
+
+        String expectedError = "Failed to connect with external API. Please try again later.";
+        this.mockMvc.perform(get("/api/plantify/guide/getSinglePlant")
+                .param("id", plantId))
+                .andExpect(status().is5xxServerError())
+                .andExpect(jsonPath("$.message", is(expectedError)));
+
+    }
+
 }

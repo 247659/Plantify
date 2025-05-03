@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import project.plantify.guide.exceptions.PerenualApiException;
 import project.plantify.guide.playloads.response.*;
 
 import java.io.IOException;
@@ -29,73 +30,90 @@ public class GuideService {
     private String apiToken;
 
     public List<PlantsResponseToFrontend> getAllPlant() {
-        PlantsResponse plants =  webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/v2/species-list")
-                        .queryParam("k", apiToken)
-                        .build())
-                .retrieve()
-                .bodyToMono(PlantsResponse.class)
-                .block();
-        return preparePlantsForFronted(Objects.requireNonNull(plants).getData());
+        try {
+            PlantsResponse plants =  webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/v2/species-list")
+                            .queryParam("k", apiToken)
+                            .build())
+                    .retrieve()
+                    .bodyToMono(PlantsResponse.class)
+                    .block();
+            return preparePlantsForFronted(Objects.requireNonNull(plants).getData());
+        } catch (RuntimeException e) {
+            throw new PerenualApiException("Failed to connect with external API. Please try again later.");
+        }
     }
 
     public List<PlantsResponseToFrontend> getAllPlantsBySpecies(String species) {
-        PlantsResponse plants = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/v2/species-list")
-                        .queryParam("key", apiToken)
-                        .queryParam("q", species)
-                        .build())
-                .retrieve()
-                .bodyToMono(PlantsResponse.class)
-                .block();
+        try {
+            PlantsResponse plants = webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/v2/species-list")
+                            .queryParam("key", apiToken)
+                            .queryParam("q", species)
+                            .build())
+                    .retrieve()
+                    .bodyToMono(PlantsResponse.class)
+                    .block();
 
-        List<PlantsResponseToFrontend> plantsResponseToFrontends = preparePlantsForFronted(Objects.requireNonNull(plants).getData());
+            List<PlantsResponseToFrontend> plantsResponseToFrontends = preparePlantsForFronted(Objects.requireNonNull(plants).getData());
 
-        Set<String> repeatedNames = new HashSet<>();
-        List<PlantsResponseToFrontend> uniquePlants = plantsResponseToFrontends.stream()
-                .filter(plant -> repeatedNames.add(plant.getCommonName()))
-                .collect(Collectors.toList());
+            Set<String> repeatedNames = new HashSet<>();
+            List<PlantsResponseToFrontend> uniquePlants = plantsResponseToFrontends.stream()
+                    .filter(plant -> repeatedNames.add(plant.getCommonName()))
+                    .collect(Collectors.toList());
 
-        uniquePlants.forEach(plant -> {
-            if (plant.getOriginalUrl() == null || plant.getOriginalUrl().isEmpty() || plant.getOriginalUrl().contains("upgrade_access.jpg")) {
-                plant.setOriginalUrl("https://images.unsplash.com/photo-1512428813834-c702c7702b78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxMXx8cGxhbnR8ZW58MHx8fHwxNzQ0MTMxOTgxfDA&ixlib=rb-4.0.3&q=80&w=1080");
-            }
-        });
+            uniquePlants.forEach(plant -> {
+                if (plant.getOriginalUrl() == null || plant.getOriginalUrl().isEmpty() || plant.getOriginalUrl().contains("upgrade_access.jpg")) {
+                    plant.setOriginalUrl("https://images.unsplash.com/photo-1512428813834-c702c7702b78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxMXx8cGxhbnR8ZW58MHx8fHwxNzQ0MTMxOTgxfDA&ixlib=rb-4.0.3&q=80&w=1080");
+                }
+            });
 
-        return uniquePlants;
+            return uniquePlants;
+        } catch (RuntimeException e) {
+            throw new PerenualApiException("Failed to connect with external API. Please try again later.");
+        }
+
     }
 
     public SinglePlantResponseToFrontend getSinglePlant(String id) {
-        SinglePlantResponse plant = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/v2/species/details/").path(id)
-                        .queryParam("key", apiToken)
-                        .build())
-                .retrieve()
-                .bodyToMono(SinglePlantResponse.class)
-                .block();
+        try {
+            SinglePlantResponse plant = webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/v2/species/details/").path(id)
+                            .queryParam("key", apiToken)
+                            .build())
+                    .retrieve()
+                    .bodyToMono(SinglePlantResponse.class)
+                    .block();
 
-        System.out.println("CHECK2");
-        return prepareSinglePlantForFronted(Objects.requireNonNull(plant));
+            System.out.println("CHECK2");
+            return prepareSinglePlantForFronted(Objects.requireNonNull(plant));
+        } catch (RuntimeException e) {
+            throw new PerenualApiException("Failed to connect with external API. Please try again later.");
+        }
     }
 
     public List<PlantsGuideFrontendResponse> getPlantsGuide(String name) {
-        PlantsGuideResponse guides = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/species-care-guide-list")
-                        .queryParam("key", apiToken)
-                        .queryParam("q", name)
-                        .build())
-                .retrieve()
-                .bodyToMono(PlantsGuideResponse.class)
-                .block();
+        try {
+            PlantsGuideResponse guides = webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/species-care-guide-list")
+                            .queryParam("key", apiToken)
+                            .queryParam("q", name)
+                            .build())
+                    .retrieve()
+                    .bodyToMono(PlantsGuideResponse.class)
+                    .block();
 
-        return preparePlantsGuideForFrontend(Objects.requireNonNull(guides).getData());
+            return preparePlantsGuideForFrontend(Objects.requireNonNull(guides).getData());
+        } catch (RuntimeException e) {
+            throw new PerenualApiException("Failed to connect with external API. Please try again later.");
+        }
     }
 
-    public PlantsGuideFrontendResponse getPlantsGuideById(String speciesId, String name) {
+    public PlantsGuideFrontendResponse getPlantsGuideById(String speciesId, String name) throws RuntimeException {
         List<PlantsGuideFrontendResponse> guides = getPlantsGuide(name);
         Optional<PlantsGuideFrontendResponse> guidesResponse = guides.stream().filter(g
                 -> Objects.equals(g.getSpeciesId(), speciesId)).findFirst();
@@ -104,17 +122,21 @@ public class GuideService {
     }
 
     public List<PlantsFAQFrontendResponse> getPlantsFAQ(String name) {
-        PlantsFAQResponse plantsFAQ = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/article-faq-list")
-                        .queryParam("key", apiToken)
-                        .queryParam("q", name)
-                        .build())
-                .retrieve()
-                .bodyToMono(PlantsFAQResponse.class)
-                .block();
+        try {
+            PlantsFAQResponse plantsFAQ = webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/article-faq-list")
+                            .queryParam("key", apiToken)
+                            .queryParam("q", name)
+                            .build())
+                    .retrieve()
+                    .bodyToMono(PlantsFAQResponse.class)
+                    .block();
 
-        return preparePlantsFAQForFrontend(Objects.requireNonNull(plantsFAQ).getData());
+            return preparePlantsFAQForFrontend(Objects.requireNonNull(plantsFAQ).getData());
+        } catch (RuntimeException e) {
+            throw new PerenualApiException("Failed to connect with external API. Please try again later.");
+        }
     }
 
     private List<PlantsFAQFrontendResponse> preparePlantsFAQForFrontend(List<PlantsFAQResponse.Data> data) {
