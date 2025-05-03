@@ -1,6 +1,7 @@
 package project.plantify.guide.services;
 
 
+import lombok.Setter;
 import org.aspectj.weaver.patterns.HasThisTypePatternTriedToSneakInSomeGenericOrParameterizedTypePatternMatchingStuffAnywhereVisitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,6 +17,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Setter
 @Service
 public class GuideService {
 
