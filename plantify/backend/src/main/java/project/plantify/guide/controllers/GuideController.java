@@ -2,14 +2,15 @@ package project.plantify.guide.controllers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.plantify.guide.exceptions.ErrorMessage;
+import project.plantify.guide.exceptions.NotFoundSpeciesException;
 import project.plantify.guide.exceptions.PerenualApiException;
 import project.plantify.guide.playloads.response.*;
 import project.plantify.guide.services.GuideService;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -65,7 +66,14 @@ public class GuideController {
     @ExceptionHandler(PerenualApiException.class)
     ResponseEntity<ErrorMessage> handle(PerenualApiException e){
         ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
-        return ResponseEntity.internalServerError().body(errorMessage);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+    }
+
+    @ExceptionHandler(NotFoundSpeciesException.class)
+    ResponseEntity<ErrorMessage> handle(NotFoundSpeciesException e){
+        ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+
     }
 
 }

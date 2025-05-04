@@ -2,19 +2,15 @@ package project.plantify.guide.services;
 
 
 import lombok.Setter;
-import org.aspectj.weaver.patterns.HasThisTypePatternTriedToSneakInSomeGenericOrParameterizedTypePatternMatchingStuffAnywhereVisitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import project.plantify.guide.exceptions.NotFoundSpeciesException;
 import project.plantify.guide.exceptions.PerenualApiException;
 import project.plantify.guide.playloads.response.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,6 +37,7 @@ public class GuideService {
                     .block();
             return preparePlantsForFronted(Objects.requireNonNull(plants).getData());
         } catch (RuntimeException e) {
+            System.out.println("Error: " + e.getMessage());
             throw new PerenualApiException("Failed to connect with external API. Please try again later.");
         }
     }
@@ -70,8 +67,15 @@ public class GuideService {
                 }
             });
 
+            if (uniquePlants.isEmpty()) {
+                System.out.println("No plants found for the given species.");
+                throw new NotFoundSpeciesException("No plants found for the given species.");
+            }
             return uniquePlants;
+        } catch (NotFoundSpeciesException e) {
+            throw e;
         } catch (RuntimeException e) {
+            System.out.println("Error: " + e.getMessage());
             throw new PerenualApiException("Failed to connect with external API. Please try again later.");
         }
 
@@ -91,6 +95,7 @@ public class GuideService {
             System.out.println("CHECK2");
             return prepareSinglePlantForFronted(Objects.requireNonNull(plant));
         } catch (RuntimeException e) {
+            System.out.println("Error: " + e.getMessage());
             throw new PerenualApiException("Failed to connect with external API. Please try again later.");
         }
     }
@@ -109,16 +114,23 @@ public class GuideService {
 
             return preparePlantsGuideForFrontend(Objects.requireNonNull(guides).getData());
         } catch (RuntimeException e) {
+            System.out.println("Error: " + e.getMessage());
             throw new PerenualApiException("Failed to connect with external API. Please try again later.");
         }
     }
 
     public PlantsGuideFrontendResponse getPlantsGuideById(String speciesId, String name) throws RuntimeException {
-        List<PlantsGuideFrontendResponse> guides = getPlantsGuide(name);
-        Optional<PlantsGuideFrontendResponse> guidesResponse = guides.stream().filter(g
-                -> Objects.equals(g.getSpeciesId(), speciesId)).findFirst();
-        System.out.println(Objects.requireNonNull(guidesResponse.orElse(null)).getSpeciesId());
-        return guidesResponse.orElse(null);
+        try {
+            List<PlantsGuideFrontendResponse> guides = getPlantsGuide(name);
+            Optional<PlantsGuideFrontendResponse> guidesResponse = guides.stream().filter(g
+                    -> Objects.equals(g.getSpeciesId(), speciesId)).findFirst();
+
+            return guidesResponse.orElseThrow(() ->
+                    new NotFoundSpeciesException(String.format("Guide not found for species with name %s", name))
+            );
+        } catch (NotFoundSpeciesException e) {
+            throw e;
+        }
     }
 
     public List<PlantsFAQFrontendResponse> getPlantsFAQ(String name) {
@@ -133,8 +145,15 @@ public class GuideService {
                     .bodyToMono(PlantsFAQResponse.class)
                     .block();
 
+            if (preparePlantsFAQForFrontend(Objects.requireNonNull(plantsFAQ).getData()).isEmpty()) {
+                System.out.println("No plants found for the given species.");
+                throw new NotFoundSpeciesException("No plants found for the given species.");
+            }
             return preparePlantsFAQForFrontend(Objects.requireNonNull(plantsFAQ).getData());
+        } catch (NotFoundSpeciesException e) {
+            throw e;
         } catch (RuntimeException e) {
+            System.out.println("Error: " + e.getMessage());
             throw new PerenualApiException("Failed to connect with external API. Please try again later.");
         }
     }
@@ -211,6 +230,7 @@ public class GuideService {
 //        }
 
         plantResponse.setCycle(plant.getCycle());
+
         plantResponse.setWatering(plant.getWatering());
 
 //        if (plant.getWateringGeneralBenchmark() == null) {
