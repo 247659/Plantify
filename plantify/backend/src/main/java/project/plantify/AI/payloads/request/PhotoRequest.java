@@ -9,6 +9,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PhotoRequest {
     private String organs;
-    private int nbresults;
     private String lang;
 }
