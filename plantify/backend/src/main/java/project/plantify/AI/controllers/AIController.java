@@ -26,6 +26,15 @@ public class AIController {
                                                                       @RequestPart("lang") String lang) {
         PhotoRequest request = new PhotoRequest(organs, lang);
         PhotoAnalysisResponse response = this.aiService.analyzePhoto(images, request);
+
+        if (response.getResults().getFirst().getSpecies().getCommonNames().isEmpty()) {
+            PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
+                    response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(),
+                    response.getResults()
+            );
+            return ResponseEntity.ok(frontendResponse);
+        }
+
         PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
                 response.getResults().getFirst().getSpecies().getCommonNames().getFirst(),
                 response.getResults()

@@ -2,24 +2,24 @@ package project.plantify.AI.services;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import project.plantify.AI.exceptions.MaxSizeException;
-import project.plantify.AI.exceptions.PhotoAnalysisException;
-import project.plantify.AI.exceptions.ResourceNotFoundException;
-import project.plantify.AI.exceptions.UnsupportedMediaTypeException;
+import project.plantify.AI.exceptions.*;
 import project.plantify.AI.payloads.request.PhotoRequest;
 import project.plantify.AI.payloads.response.PhotoAnalysisResponse;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
+
+import static org.springframework.http.HttpStatus.*;
 
 @Service
 public class AIService {
@@ -33,15 +33,18 @@ public class AIService {
     }
 
     public PhotoAnalysisResponse analyzePhoto(List<MultipartFile> images, PhotoRequest request) {
+        if (images.getFirst().getContentType() == null || images.isEmpty()) {
+            throw new EmptyImageException("There is no image to analyze");
+        }
         try {
-            MultipartBodyBuilder requestBuilder = buildRequest(images, request.getOrgans());
+            MultipartBodyBuilder requestBuilder = buildMultipartBody(images, request.getOrgans());
             return sendRequestToAPI(requestBuilder, request.getLang());
         } catch (WebClientResponseException e) {
             throw new PhotoAnalysisException("Server error", e);
         }
     }
 
-    public MultipartBodyBuilder buildRequest(List<MultipartFile> images, String organs) {
+    private MultipartBodyBuilder buildMultipartBody(List<MultipartFile> images, String organs) {
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
 
         for (MultipartFile image : images) {
@@ -52,7 +55,7 @@ public class AIService {
         return builder;
     }
 
-    public PhotoAnalysisResponse sendRequestToAPI(MultipartBodyBuilder requestBuilder, String lang) {
+    private PhotoAnalysisResponse sendRequestToAPI(MultipartBodyBuilder requestBuilder, String lang) {
         return webClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .path("/all")
@@ -63,30 +66,29 @@ public class AIService {
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(requestBuilder.build()))
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, response -> {
-                    if (response.statusCode() == HttpStatus.NOT_FOUND) {
-                        return response
-                                .bodyToMono(String.class)
-                                .map(msg -> new ResourceNotFoundException("Plant unrecognized"));
-                    }
-                    if (response.statusCode() == HttpStatus.BAD_REQUEST) {
-                        return response
-                                .bodyToMono(String.class)
-                                .map(msg -> new UnsupportedMediaTypeException("Wrong file format"));
-                    }
-                    if (response.statusCode() == HttpStatus.PAYLOAD_TOO_LARGE) {
-                        return response
-                                .bodyToMono(String.class)
-                                .map(msg -> new MaxSizeException("File too large"));
-                    }
-                    return response
-                            .bodyToMono(String.class)
-                            .map(msg -> new PhotoAnalysisException("Server error", new Throwable(msg)));
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, response -> response
-                        .bodyToMono(String.class)
-                        .map(msg -> new PhotoAnalysisException("ServerError" , new Throwable(msg))))
+                .onStatus(HttpStatusCode::is4xxClientError, this::handle4xxError)
+                .onStatus(HttpStatusCode::is5xxServerError, this::handle5xxError)
                 .bodyToMono(PhotoAnalysisResponse.class)
                 .block();
+    }
+
+    private Mono<? extends Throwable> handle4xxError(ClientResponse response) {
+        return response
+                .bodyToMono(String.class)
+                .map(msg -> {
+                    HttpStatusCode status = response.statusCode();
+                    return switch (status) {
+                        case NOT_FOUND -> new UnrecognizedPlantException("Plant unrecognized");
+                        case BAD_REQUEST -> new UnsupportedMediaTypeException("Wrong file format");
+                        case PAYLOAD_TOO_LARGE -> new MaxSizeException("File too large");
+                        default -> new PhotoAnalysisException("Server error", new Throwable(msg));
+                    };
+                });
+    }
+
+    private Mono<? extends Throwable> handle5xxError(ClientResponse response) {
+        return response
+                .bodyToMono(String.class)
+                .map(msg -> new PhotoAnalysisException("ServerError" , new Throwable(msg)));
     }
 }
