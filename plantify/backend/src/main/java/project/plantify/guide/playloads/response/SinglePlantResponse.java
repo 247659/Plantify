@@ -75,6 +75,9 @@ public class SinglePlantResponse {
         private List<String> color;
     }
 
+    @JsonProperty("origin")
+    private List<String> origin;
+
     @JsonProperty("sunlight")
     private List<String> sunlight;
 
@@ -89,7 +92,7 @@ public class SinglePlantResponse {
     @Setter
     public static class PruningCount {
         @JsonProperty("amount")
-        private int amount;
+        private String amount;
 
         @JsonProperty("interval")
         private String interval;

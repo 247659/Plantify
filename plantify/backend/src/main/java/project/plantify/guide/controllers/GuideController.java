@@ -51,8 +51,9 @@ public class GuideController {
     @GetMapping("/getPlantsGuideById")
     public ResponseEntity<PlantsGuideFrontendResponse> getPlantsGuideById(@RequestParam("speciesId") String id,
                                                                           @RequestParam("speciesName") String name) {
+        System.out.println("Raz");
         PlantsGuideFrontendResponse response = this.guideService.getPlantsGuideById(id, name.toLowerCase());
-        System.out.println(response);
+        System.out.println("Dwa");
         return ResponseEntity.ok(response);
     }
 
@@ -64,12 +65,14 @@ public class GuideController {
     }
 
     @ExceptionHandler(PerenualApiException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     ResponseEntity<ErrorMessage> handle(PerenualApiException e){
         ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
     }
 
     @ExceptionHandler(NotFoundSpeciesException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     ResponseEntity<ErrorMessage> handle(NotFoundSpeciesException e){
         ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);

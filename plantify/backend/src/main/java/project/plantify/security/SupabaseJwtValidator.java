@@ -19,7 +19,7 @@ public class SupabaseJwtValidator {
                     .build()
                     .parseClaimsJws(token);
 
-            return true; // Token poprawny
+            return true;
 
         } catch (ExpiredJwtException e) {
             System.out.println("Token wygasł: " + e.getMessage());

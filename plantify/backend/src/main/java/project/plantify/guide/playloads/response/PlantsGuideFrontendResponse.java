@@ -11,13 +11,8 @@ public class PlantsGuideFrontendResponse {
     private String id;
     private String speciesId;
     private String commonName;
-    private List<Section> sections;
+    private String watering;
+    private String sunLight;
+    private String pruning;
 
-    @Getter
-    @Setter
-    public static class Section {
-        private String id;
-        private String type;
-        private String description;
-    }
 }

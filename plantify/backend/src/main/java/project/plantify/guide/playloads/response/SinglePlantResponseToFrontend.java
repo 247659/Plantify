@@ -20,8 +20,9 @@ public class SinglePlantResponseToFrontend {
     private WateringBenchmark wateringGeneralBenchmark;
     private List<PlantPart> plantAnatomy;
     private List<String> sunlight;
+    private List<String> origin;
     private List<String> pruningMonth;
-    private List<PruningCount> pruningCount;
+    private PruningCount pruningCount;
     private String seeds;
     private List<String> propagation;
     private boolean flowers;
@@ -79,7 +80,7 @@ public class SinglePlantResponseToFrontend {
     @Getter
     @Setter
     public static class PruningCount {
-        private int amount;
+        private String amount;
         private String interval;
     }
 }

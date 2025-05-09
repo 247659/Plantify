@@ -5,11 +5,14 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import project.plantify.guide.exceptions.NotFoundSpeciesException;
 import project.plantify.guide.exceptions.PerenualApiException;
 import project.plantify.guide.playloads.response.*;
+import reactor.core.publisher.Mono;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -120,17 +123,13 @@ public class GuideService {
     }
 
     public PlantsGuideFrontendResponse getPlantsGuideById(String speciesId, String name) throws RuntimeException {
-        try {
-            List<PlantsGuideFrontendResponse> guides = getPlantsGuide(name);
-            Optional<PlantsGuideFrontendResponse> guidesResponse = guides.stream().filter(g
-                    -> Objects.equals(g.getSpeciesId(), speciesId)).findFirst();
+        List<PlantsGuideFrontendResponse> guides = getPlantsGuide(name);
+        Optional<PlantsGuideFrontendResponse> guidesResponse = guides.stream().filter(g
+                -> Objects.equals(g.getSpeciesId(), speciesId)).findFirst();
 
-            return guidesResponse.orElseThrow(() ->
-                    new NotFoundSpeciesException(String.format("Guide not found for species with name %s", name))
-            );
-        } catch (NotFoundSpeciesException e) {
-            throw e;
-        }
+        return guidesResponse.orElseThrow(() ->
+                new NotFoundSpeciesException(String.format("Guide not found for species with name %s", name))
+        );
     }
 
     public List<PlantsFAQFrontendResponse> getPlantsFAQ(String name) {
@@ -185,16 +184,13 @@ public class GuideService {
         plantResponse.setSpeciesId(String.valueOf(plant.getSpeciesId()));
         plantResponse.setCommonName(plant.getCommonName());
 
-        List<PlantsGuideFrontendResponse.Section> sections = plant.getSection().stream()
-                .map(s -> {
-                    PlantsGuideFrontendResponse.Section section = new PlantsGuideFrontendResponse.Section();
-                    section.setId(String.valueOf(s.getId()));
-                    section.setType(s.getType());
-                    section.setDescription(s.getDescription());
-                    return section;
-                })
-                .collect(Collectors.toList());
-        plantResponse.setSections(sections);
+        plant.getSection().forEach(section -> {
+            switch (section.getType()) {
+                case "watering" -> plantResponse.setWatering(section.getDescription());
+                case "sunlight" -> plantResponse.setSunLight(section.getDescription());
+                case "pruning" -> plantResponse.setPruning(section.getDescription());
+            }
+        });
 
         return plantResponse;
     }
@@ -264,6 +260,7 @@ public class GuideService {
 //        }
 
         plantResponse.setSunlight(plant.getSunlight());
+        plantResponse.setOrigin(plant.getOrigin());
         plantResponse.setPruningMonth(plant.getPruningMonth());
 
         System.out.println("-------------");
@@ -277,15 +274,25 @@ public class GuideService {
 //            plantResponse.setPruningCount(newPruningCount);
 //            plantResponse.getPruningCount().add(pruningCount);
 //        } else {
-            List<SinglePlantResponseToFrontend.PruningCount> plantPruningCount = plant.getPruningCount().stream()
-                    .map(pa -> {
-                        SinglePlantResponseToFrontend.PruningCount count = new SinglePlantResponseToFrontend.PruningCount();
-                        count.setAmount(pa.getAmount());
-                        count.setInterval(pa.getInterval());
-                        return count;
-                    })
-                    .collect(Collectors.toList());
-            plantResponse.setPruningCount(plantPruningCount);
+        SinglePlantResponse.PruningCount pruningCount = new SinglePlantResponse.PruningCount();
+        if (!plant.getPruningCount().isEmpty()) {
+            pruningCount.setAmount(plant.getPruningCount().getFirst().getAmount());
+            pruningCount.setInterval(plant.getPruningCount().getFirst().getInterval());
+        } else {
+            pruningCount.setAmount(null);
+            pruningCount.setInterval(null);
+        }
+
+
+//            List<SinglePlantResponseToFrontend.PruningCount> plantPruningCount = plant.getPruningCount().stream()
+//                    .map(pa -> {
+//                        SinglePlantResponseToFrontend.PruningCount count = new SinglePlantResponseToFrontend.PruningCount();
+//                        count.setAmount(pa.getAmount());
+//                        count.setInterval(pa.getInterval());
+//                        return count;
+//                    })
+//                    .collect(Collectors.toList());
+//            plantResponse.setPruningCount(plantPruningCount);
 //        }
 
         plantResponse.setSeeds(plant.getSeeds());
