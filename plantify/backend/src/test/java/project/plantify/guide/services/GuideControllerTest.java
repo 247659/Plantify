@@ -1,9 +1,6 @@
 package project.plantify.guide.services;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -232,7 +229,10 @@ class GuideControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("speciesId", is("183")))
                 .andExpect(jsonPath("commonName", is("Strawberry Tree")))
-                .andExpect(jsonPath("sections").isArray());
+                .andExpect(jsonPath("watering").isNotEmpty())
+                .andExpect(jsonPath("sunLight").isNotEmpty())
+                .andExpect(jsonPath("pruning").isNotEmpty());
+
     }
 
     @Test
@@ -755,6 +755,123 @@ class GuideControllerTest {
 
     }
 
+    @Test
+    void getSinglePlantNotFoundPlant() throws Exception {
+        String plantId = "1000";
+        wireMockServer.stubFor(WireMock.get(WireMock.urlPathEqualTo("/v2/species/details/" + plantId))
+                .withQueryParam("key", WireMock.matching(".*"))
+                .willReturn(aResponse().withStatus(429)));
 
+        String expectedError = "Plant not found";
+        mockMvc.perform(get("/api/plantify/guide/getSinglePlant")
+                        .param("id", plantId))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(expectedError)));
+    }
+
+    @Test
+    void getSinglePlantEmptyArrays() throws Exception {
+        String plantId = "183";
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/v2/species/details/" + plantId)) // Właściwy URL API
+                .withQueryParam("key", WireMock.matching(".*"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                        .withBody("""
+                                  {
+                                      "id": 183,
+                                      "common_name": "Strawberry Tree",
+                                      "scientific_name": [
+                                          "Arbutus unedo"
+                                      ],
+                                      "other_name": [
+                                          "Apple of Cain; Cane Apple"
+                                      ],
+                                      "family": "Ericaceae",
+                                      "hybrid": null,
+                                      "origin": [],
+                                      "type": "tree",
+                                      "dimensions": [],
+                                      "cycle": "Perennial",
+                                      "attracts": [],
+                                      "propagation": [
+                                          "Greenwood Cuttings",
+                                          "Greenwood Cuttings",
+                                          "Hardwood Cuttings",
+                                          "Seed Propagation"
+                                      ],
+                                      "hardiness": {
+                                          "min": "7",
+                                          "max": "7"
+                                      },
+                                      "hardiness_location": {
+                                          "full_url": "https://perenual.com/api/hardiness-map?species_id=183&size=og&key=sk-anZ367f82841555e99722",
+                                          "full_iframe": "<iframe frameborder=0 scrolling=yes seamless=seamless width=1000 height=550 style='margin:auto;' src='https://perenual.com/api/hardiness-map?species_id=183&size=og&key=sk-anZ367f82841555e99722'></iframe>"
+                                      },
+                                      "watering": "Average",
+                                      "watering_general_benchmark": {
+                                          "value": null,
+                                          "unit": "days"
+                                      },
+                                      "plant_anatomy": [],
+                                      "sunlight": [],
+                                      "pruning_month": [],
+                                      "pruning_count": [],
+                                      "seeds": true,
+                                      "maintenance": "Low",
+                                      "care_guides": "http://perenual.com/api/species-care-guide-list?species_id=183&key=sk-anZ367f82841555e99722",
+                                      "soil": [],
+                                      "growth_rate": "Moderate",
+                                      "drought_tolerant": true,
+                                      "salt_tolerant": false,
+                                      "thorny": true,
+                                      "invasive": false,
+                                      "tropical": false,
+                                      "indoor": false,
+                                      "care_level": "Medium",
+                                      "pest_susceptibility": [
+                                          "Fungal leaf spot",
+                                          " Root rot",
+                                          " Scale insects",
+                                          "  Drought resistant "
+                                      ],
+                                      "flowers": true,
+                                      "flowering_season": "Winter",
+                                      "cones": false,
+                                      "fruits": true,
+                                      "edible_fruit": true,
+                                      "harvest_season": "Fall",
+                                      "leaf": true,
+                                      "edible_leaf": false,
+                                      "cuisine": false,
+                                      "medicinal": true,
+                                      "poisonous_to_humans": false,
+                                      "poisonous_to_pets": false,
+                                      "description": "The Strawberry Tree (Arbutus unedo) is an amazing species that offers year-round beauty. It is a fruiting evergreen with attractive foliage and delicate whitish-pink blooms that develop into bright, red-orange fruits throughout the season. In addition to its showy beauty, this plant is incredibly hardy and can survive in a wide range of soil types and light conditions. With its easy maintenance and interesting lifestyle, the Strawberry Tree is a must for any gardener looking for a low-care, eye-catching addition to their landscape.",
+                                      "default_image": {
+                                          "license": 6,
+                                          "license_name": "Attribution-NoDerivs License",
+                                          "license_url": "https://creativecommons.org/licenses/by-nd/2.0/",
+                                          "original_url": "https://perenual.com/storage/species_image/183_arbutus_unedo/og/50433219232_449b440340_b.jpg"
+                                      }
+                                  }
+                        """)
+                ));
+
+        mockMvc.perform(get("/api/plantify/guide/getSinglePlant")
+                        .param("id", plantId)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.origin").isEmpty())
+                .andExpect(jsonPath("$.dimensions").isEmpty())
+                .andExpect(jsonPath("$.sunlight").isEmpty())
+                .andExpect(jsonPath("$.pruningMonth").isEmpty())
+                .andExpect(jsonPath("$.pruningCount").isEmpty())
+                .andExpect(jsonPath("$.soil").isEmpty())
+                .andExpect(jsonPath("$.plantAnatomy").isEmpty());
+
+
+    }
 
 }
