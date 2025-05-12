@@ -515,7 +515,7 @@ class GuideControllerTest {
                                       },
                                       "watering": "Average",
                                       "watering_general_benchmark": {
-                                          "value": null,
+                                          "value": 3,
                                           "unit": "days"
                                       },
                                       "plant_anatomy": [
@@ -810,10 +810,7 @@ class GuideControllerTest {
                                           "full_iframe": "<iframe frameborder=0 scrolling=yes seamless=seamless width=1000 height=550 style='margin:auto;' src='https://perenual.com/api/hardiness-map?species_id=183&size=og&key=sk-anZ367f82841555e99722'></iframe>"
                                       },
                                       "watering": "Average",
-                                      "watering_general_benchmark": {
-                                          "value": null,
-                                          "unit": "days"
-                                      },
+                                      "watering_general_benchmark": [],
                                       "plant_anatomy": [],
                                       "sunlight": [],
                                       "pruning_month": [],
@@ -867,11 +864,11 @@ class GuideControllerTest {
                 .andExpect(jsonPath("$.origin").isEmpty())
                 .andExpect(jsonPath("$.dimensions").isEmpty())
                 .andExpect(jsonPath("$.sunlight").isEmpty())
+                .andExpect(jsonPath("$.wateringGeneralBenchmark").isEmpty())
                 .andExpect(jsonPath("$.pruningMonth").isEmpty())
                 .andExpect(jsonPath("$.pruningCount").isEmpty())
                 .andExpect(jsonPath("$.soil").isEmpty())
                 .andExpect(jsonPath("$.plantAnatomy").isEmpty());
-
 
     }
 

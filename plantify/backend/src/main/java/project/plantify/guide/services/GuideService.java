@@ -206,9 +206,11 @@ public class GuideService {
 
 
         SinglePlantResponseToFrontend.WateringBenchmark wateringBenchmark = new SinglePlantResponseToFrontend.WateringBenchmark();
-        wateringBenchmark.setUnit(plant.getWateringGeneralBenchmark().getUnit());
-        wateringBenchmark.setValue(plant.getWateringGeneralBenchmark().getValue());
-        plantResponse.setWateringGeneralBenchmark(wateringBenchmark);
+        if (plant.getWateringGeneralBenchmark() != null) {
+            wateringBenchmark.setUnit(plant.getWateringGeneralBenchmark().getUnit());
+            wateringBenchmark.setValue(plant.getWateringGeneralBenchmark().getValue());
+            plantResponse.setWateringGeneralBenchmark(wateringBenchmark);
+        }
 
         List<SinglePlantResponseToFrontend.PlantPart> plantAnatomy = plant.getPlantAnatomy().stream()
                 .map(pa -> {
@@ -224,13 +226,11 @@ public class GuideService {
         plantResponse.setOrigin(plant.getOrigin());
         plantResponse.setPruningMonth(plant.getPruningMonth());
 
-        SinglePlantResponse.PruningCount pruningCount = new SinglePlantResponse.PruningCount();
-        if (!plant.getPruningCount().isEmpty()) {
-            pruningCount.setAmount(plant.getPruningCount().getFirst().getAmount());
-            pruningCount.setInterval(plant.getPruningCount().getFirst().getInterval());
-        } else {
-            pruningCount.setAmount(null);
-            pruningCount.setInterval(null);
+        SinglePlantResponseToFrontend.PruningCount pruningCount = new SinglePlantResponseToFrontend.PruningCount();
+        if (plant.getPruningCount() != null) {
+            pruningCount.setAmount(plant.getPruningCount().getAmount());
+            pruningCount.setInterval(plant.getPruningCount().getInterval());
+            plantResponse.setPruningCount(pruningCount);
         }
 
         plantResponse.setSeeds(plant.getSeeds());

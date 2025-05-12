@@ -66,7 +66,7 @@ public class SinglePlantResponseToFrontend {
     @Getter
     @Setter
     public static class WateringBenchmark {
-        private String value;
+        private Integer value;
         private String unit;
     }
 
@@ -80,7 +80,7 @@ public class SinglePlantResponseToFrontend {
     @Getter
     @Setter
     public static class PruningCount {
-        private String amount;
+        private int amount;
         private String interval;
     }
 }

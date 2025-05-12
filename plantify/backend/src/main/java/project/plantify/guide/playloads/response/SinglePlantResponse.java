@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.Setter;
+import project.plantify.guide.services.ArrayToObjectDeserializer;
 import project.plantify.guide.services.PruningCountDeserializer;
+import project.plantify.guide.services.WateringBenchmarkDeserializer;
 
 import java.util.List;
 
@@ -50,13 +52,14 @@ public class SinglePlantResponse {
     private String watering;
 
     @JsonProperty("watering_general_benchmark")
+    @JsonDeserialize(using = WateringBenchmarkDeserializer.class)
     private WateringBenchmark wateringGeneralBenchmark;
 
     @Getter
     @Setter
     public static class WateringBenchmark {
         @JsonProperty("value")
-        private String value;
+        private Integer value;
 
         @JsonProperty("unit")
         private String unit;
@@ -86,13 +89,13 @@ public class SinglePlantResponse {
 
     @JsonProperty("pruning_count")
     @JsonDeserialize(using = PruningCountDeserializer.class)
-    private List<PruningCount> pruningCount;
+    private PruningCount pruningCount;
 
     @Getter
     @Setter
     public static class PruningCount {
         @JsonProperty("amount")
-        private String amount;
+        private int amount;
 
         @JsonProperty("interval")
         private String interval;
