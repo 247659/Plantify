@@ -58,8 +58,8 @@ public class SinglePlantResponseToFrontend {
     @Setter
     public static class Dimensions {
         private String type;
-        private String minValue;
-        private String maxValue;
+        private Integer minValue;
+        private Integer maxValue;
         private String unit;
     }
 

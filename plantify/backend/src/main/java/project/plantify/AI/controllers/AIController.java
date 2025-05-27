@@ -23,9 +23,9 @@ public class AIController {
     @Autowired
     private GroqService groqService;
 
-    //public AIController(AIService aiService) {
-    //    this.aiService = aiService;
-    //}
+    public AIController(AIService aiService) {
+        this.aiService = aiService;
+    }
 
     @PostMapping(value = "/getSpecies")
     public ResponseEntity<PhotoAnalysisResponseToFrontend> getSpecies(@RequestPart("images") List<MultipartFile> images,

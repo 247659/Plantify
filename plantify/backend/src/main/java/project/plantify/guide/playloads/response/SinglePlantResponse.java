@@ -36,10 +36,10 @@ public class SinglePlantResponse {
         private String type;
 
         @JsonProperty("min_value")
-        private String minValue;
+        private Integer minValue;
 
         @JsonProperty("max_value")
-        private String maxValue;
+        private Integer maxValue;
 
         @JsonProperty("unit")
         private String unit;

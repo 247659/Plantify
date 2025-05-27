@@ -14,6 +14,7 @@ public class PlantifyApplication {
 		System.setProperty("SUPABASE_JWT_SECRET", dotenv.get("SUPABASE_JWT_SECRET"));
 		System.setProperty("PLANT_NET_API_KEY", dotenv.get("PLANT_NET_API_KEY"));
 		System.setProperty("GROQ_API_KEY", dotenv.get("GROQ_API_KEY"));
+		System.setProperty("GROQCHAT_API_KEY", dotenv.get("GROQCHAT_API_KEY"));
 		System.out.println(dotenv.get("PLANT_NET_API_KEY"));
 
 		SpringApplication.run(PlantifyApplication.class, args);
