@@ -1,12 +1,15 @@
 package project.plantify.AI.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.plantify.AI.payloads.request.PhotoRequest;
+import project.plantify.AI.payloads.response.GroqResponse;
 import project.plantify.AI.payloads.response.PhotoAnalysisResponse;
 import project.plantify.AI.payloads.response.PhotoAnalysisResponseToFrontend;
 import project.plantify.AI.services.AIService;
+import project.plantify.AI.services.GroqService;
 
 import java.util.List;
 
@@ -14,11 +17,15 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api/plantify/ai")
 public class AIController {
-    private final AIService aiService;
+    @Autowired
+    private AIService aiService;
 
-    public AIController(AIService aiService) {
-        this.aiService = aiService;
-    }
+    @Autowired
+    private GroqService groqService;
+
+    //public AIController(AIService aiService) {
+    //    this.aiService = aiService;
+    //}
 
     @PostMapping(value = "/getSpecies")
     public ResponseEntity<PhotoAnalysisResponseToFrontend> getSpecies(@RequestPart("images") List<MultipartFile> images,
@@ -40,6 +47,13 @@ public class AIController {
                 response.getResults()
         );
         return ResponseEntity.ok(frontendResponse);
+    }
+
+    @GetMapping(value = "/generateShoppingList")
+    public ResponseEntity<GroqResponse> generateShoppingList(@RequestParam("species") String species) throws Exception {
+        String language = "pl";
+        GroqResponse response = this.groqService.generateShoppingList(species, language);
+        return ResponseEntity.ok(response);
     }
 
 }
