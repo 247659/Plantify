@@ -1,6 +1,7 @@
 package project.plantify.AI.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.plantify.AI.payloads.response.ChatResponse;
@@ -16,11 +17,16 @@ public class ChatController {
     private ChatService chatService;
 
     @PostMapping("/generate")
-    public ResponseEntity<ChatResponse> chat(@RequestBody Map<String, String> body,
-                               @RequestParam(value = "userId") String userId) {
+    public ResponseEntity<ChatResponse> chat(@RequestBody Map<String, String> body) {
 
         String message = body.get("mes");
-        return ResponseEntity.ok(chatService.chat(message, userId));
+        String userId = body.get("userId");
+        ChatResponse chatResponse = chatService.chat(message, userId);
+        System.out.println("Response " + chatResponse.getContent());
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(chatResponse);
     }
 
 }

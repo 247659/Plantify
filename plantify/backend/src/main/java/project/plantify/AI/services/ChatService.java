@@ -8,6 +8,8 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.stereotype.Service;
+import project.plantify.AI.exceptions.AIResponseException;
+import project.plantify.AI.exceptions.BadDataException;
 import project.plantify.AI.payloads.response.ChatResponse;
 
 import java.util.List;
@@ -25,34 +27,44 @@ public class ChatService {
     }
 
     public ChatResponse chat(String message, String userId) {
-        ChatMemory singleChatMemory = getOrCreateChatMemory(userId);
+        try {
+            ChatMemory singleChatMemory = getOrCreateChatMemory(userId);
 
-        if (message == null || message.isEmpty()) {
-            throw new IllegalArgumentException("Message cannot be empty");
+            if (message == null || message.isEmpty()) {
+                throw new BadDataException("Message cannot be empty");
+            } else if (userId == null || userId.isEmpty()) {
+                throw new BadDataException("User ID cannot be empty");
+            }
+
+            if (singleChatMemory.get(userId).size() >= 10) {
+                singleChatMemory.get(userId).removeFirst();
+            }
+
+            singleChatMemory.add(userId, new UserMessage(message));
+
+//            System.out.println(singleChatMemory.get(userId).getFirst().getMessageType());
+//            System.out.println(singleChatMemory.get(userId).getFirst().getText());
+            System.out.println("Received message: " + message);
+
+            String prompt = buildPrompt(singleChatMemory.get(userId));
+//            System.out.println(prompt);
+            String response = chatClient.prompt().user(prompt)
+                    .call()
+                    .content();
+
+            if (response == null || response.isEmpty()) {
+                throw new IllegalStateException("Response from chat client is empty");
+            }
+            singleChatMemory.add(userId, new AssistantMessage(response));
+
+            return new ChatResponse("assistant", response);
+        } catch (BadDataException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new AIResponseException("Something gone wrong... Try again later.");
         }
 
-        if (singleChatMemory.get(userId).size() >= 10) {
-            singleChatMemory.get(userId).removeFirst();
-        }
 
-        singleChatMemory.add(userId, new UserMessage(message));
-
-        System.out.println(singleChatMemory.get(userId).getFirst().getMessageType());
-        System.out.println(singleChatMemory.get(userId).getFirst().getText());
-        System.out.println("Received message: " + message);
-
-        String prompt = buildPrompt(singleChatMemory.get(userId));
-        System.out.println(prompt);
-        String response = chatClient.prompt().user(prompt)
-                .call()
-                .content();
-
-        if (response == null || response.isEmpty()) {
-            throw new IllegalStateException("Response from chat client is empty");
-        }
-        singleChatMemory.add(userId, new AssistantMessage(response));
-
-        return new ChatResponse("assistant", response);
     }
 
     private String buildPrompt(List<Message> messages) {

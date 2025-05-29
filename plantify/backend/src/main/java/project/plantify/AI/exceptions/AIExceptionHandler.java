@@ -48,4 +48,20 @@ public class AIExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+    @ExceptionHandler(AIResponseException.class)
+    public ResponseEntity<ErrorResponse> handleAIResponseException(AIResponseException exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        errorResponse.setPath(request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    @ExceptionHandler(BadDataException.class)
+    public ResponseEntity<ErrorResponse> handleBadDataException(BadDataException exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        errorResponse.setPath(request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
 }
