@@ -29,4 +29,10 @@ public class ChatController {
                 .body(chatResponse);
     }
 
+    @DeleteMapping("/refresh")
+    public ResponseEntity<Void> refresh(@RequestParam ("userId") String userId) {
+        chatService.refresh(userId);
+        return ResponseEntity.ok().build();
+    }
+
 }

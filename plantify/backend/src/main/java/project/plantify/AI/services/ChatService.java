@@ -93,4 +93,21 @@ public class ChatService {
         });
     }
 
+    public void refresh(String userId) {
+        try {
+            if (userId == null || userId.isEmpty()) {
+                throw new BadDataException("User ID cannot be empty");
+            }
+
+            ChatMemory singleChatMemory = getOrCreateChatMemory(userId);
+            singleChatMemory.clear(userId);
+
+        } catch (BadDataException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new AIResponseException("Something gone wrong... Try again later.");
+        }
+
+    }
+
 }

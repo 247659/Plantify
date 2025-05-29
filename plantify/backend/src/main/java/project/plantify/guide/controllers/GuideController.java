@@ -64,19 +64,4 @@ public class GuideController {
         return ResponseEntity.ok(response);
     }
 
-    @ExceptionHandler(PerenualApiException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    ResponseEntity<ErrorMessage> handle(PerenualApiException e){
-        ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
-    }
-
-    @ExceptionHandler(NotFoundSpeciesException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    ResponseEntity<ErrorMessage> handle(NotFoundSpeciesException e){
-        ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
-
-    }
-
 }

@@ -31,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "supabase.jwt.secret=test_jwt_secret",
                 "plant.api.token=test_api_token",
                 "plant.net.api.key=test_net_api_key",
+                "groq.api.key=test_groq_api_key",
         }
 )
 @AutoConfigureMockMvc
