@@ -5,6 +5,8 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.Local;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -24,10 +26,13 @@ public class GuideService {
     @Qualifier("Guide")
     private WebClient webClient;
 
+    @Autowired
+    private  MessageSource messageSource;
+
     @Value("${plant.api.token}")
     private String apiToken;
 
-    public List<PlantsResponseToFrontend> getAllPlant() {
+    public List<PlantsResponseToFrontend> getAllPlant(Locale locale) {
         PlantsResponse plants =  webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v2/species-list")
@@ -35,18 +40,18 @@ public class GuideService {
                         .build())
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError, response ->
-                        Mono.error(new PerenualApiException("Failed to connect with external API. Please try again later.")))
+                        Mono.error(new PerenualApiException(messageSource.getMessage("error.failedConnection", null, locale))))
                 .bodyToMono(PlantsResponse.class)
                 .block();
 
         if (Objects.requireNonNull(plants).getData().isEmpty()) {
-            throw new NotFoundSpeciesException("No plants found.");
+            throw new NotFoundSpeciesException(messageSource.getMessage("error.noPlants", null, locale));
         }
 
         return preparePlantsForFronted(Objects.requireNonNull(plants).getData());
     }
 
-    public List<PlantsResponseToFrontend> getAllPlantsBySpecies(String species) {
+    public List<PlantsResponseToFrontend> getAllPlantsBySpecies(String species, Locale locale) {
         PlantsResponse plants = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v2/species-list")
@@ -55,7 +60,7 @@ public class GuideService {
                         .build())
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError, response ->
-                        Mono.error(new PerenualApiException("Failed to connect with external API. Please try again later.")))
+                        Mono.error(new PerenualApiException(messageSource.getMessage("error.failedConnection", null, locale))))
                 .bodyToMono(PlantsResponse.class)
                 .block();
 
@@ -73,14 +78,14 @@ public class GuideService {
         });
 
         if (uniquePlants.isEmpty()) {
-            System.out.println("No plants found for the given species.");
-            throw new NotFoundSpeciesException("No plants found for the given species.");
+            System.out.println(messageSource.getMessage("error.noPlantsForSpecies", null, locale));
+            throw new NotFoundSpeciesException(messageSource.getMessage("error.noPlantsForSpecies", null, locale));
         }
         return uniquePlants;
 
     }
 
-    public SinglePlantResponseToFrontend getSinglePlant(String id) {
+    public SinglePlantResponseToFrontend getSinglePlant(String id, Locale locale) {
         SinglePlantResponse plant = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v2/species/details/").path(id)
@@ -88,16 +93,17 @@ public class GuideService {
                         .build())
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError, response ->
-                        Mono.error(new PerenualApiException("Failed to connect with external API. Please try again later.")))
+                        Mono.error(new PerenualApiException(messageSource.getMessage("error.failedConnection"
+                                , null, locale))))
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse ->
-                        Mono.error(new NotFoundSpeciesException("Plant not found")))
+                        Mono.error(new NotFoundSpeciesException(messageSource.getMessage("error.noPlant", null, locale))))
                 .bodyToMono(SinglePlantResponse.class)
                 .block();
 
         return prepareSinglePlantForFronted(Objects.requireNonNull(plant));
     }
 
-    public List<PlantsGuideFrontendResponse> getPlantsGuide(String name) {
+    public List<PlantsGuideFrontendResponse> getPlantsGuide(String name, Locale locale) {
         PlantsGuideResponse guides = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/species-care-guide-list")
@@ -106,7 +112,7 @@ public class GuideService {
                         .build())
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError, response ->
-                        Mono.error(new PerenualApiException("Failed to connect with external API. Please try again later.")))
+                        Mono.error(new PerenualApiException(messageSource.getMessage("error.failedConnection", null, locale))))
                 .bodyToMono(PlantsGuideResponse.class)
                 .block();
 
@@ -114,17 +120,17 @@ public class GuideService {
 
     }
 
-    public PlantsGuideFrontendResponse getPlantsGuideById(String speciesId, String name) throws RuntimeException {
-        List<PlantsGuideFrontendResponse> guides = getPlantsGuide(name);
+    public PlantsGuideFrontendResponse getPlantsGuideById(String speciesId, String name, Locale locale) throws RuntimeException {
+        List<PlantsGuideFrontendResponse> guides = getPlantsGuide(name, locale);
         Optional<PlantsGuideFrontendResponse> guidesResponse = guides.stream().filter(g
                 -> Objects.equals(g.getSpeciesId(), speciesId)).findFirst();
 
         return guidesResponse.orElseThrow(() ->
-                new NotFoundSpeciesException(String.format("Guide not found for species with name %s", name))
+                new NotFoundSpeciesException(String.format(messageSource.getMessage("error.noGuide", null, locale), name))
         );
     }
 
-    public List<PlantsFAQFrontendResponse> getPlantsFAQ(String name) {
+    public List<PlantsFAQFrontendResponse> getPlantsFAQ(String name, Locale locale) {
         PlantsFAQResponse plantsFAQ = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/article-faq-list")
@@ -133,13 +139,13 @@ public class GuideService {
                         .build())
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError, response ->
-                        Mono.error(new PerenualApiException("Failed to connect with external API. Please try again later.")))
+                        Mono.error(new PerenualApiException(messageSource.getMessage("error.failedConnection", null, locale))))
                 .bodyToMono(PlantsFAQResponse.class)
                 .block();
 
         if (preparePlantsFAQForFrontend(Objects.requireNonNull(plantsFAQ).getData()).isEmpty()) {
-            System.out.println("No plants found for the given species.");
-            throw new NotFoundSpeciesException("No plants found for the given species.");
+            System.out.println(messageSource.getMessage("error.noPlantsForSpecies", null, locale));
+            throw new NotFoundSpeciesException(messageSource.getMessage("error.noPlantsForSpecies", null, locale));
         }
         return preparePlantsFAQForFrontend(Objects.requireNonNull(plantsFAQ).getData());
     }

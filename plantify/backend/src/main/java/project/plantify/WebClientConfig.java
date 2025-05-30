@@ -17,4 +17,5 @@ public class WebClientConfig {
 
     @Bean("AI")
     public WebClient aiWebClient() {return WebClient.builder().baseUrl("https://my-api.plantnet.org/v2/identify").build();}
+    
 }

@@ -3,6 +3,13 @@ package project.plantify;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
+
+import java.util.Locale;
 
 @SpringBootApplication
 public class PlantifyApplication {
@@ -18,6 +25,23 @@ public class PlantifyApplication {
 		System.out.println(dotenv.get("PLANT_NET_API_KEY"));
 
 		SpringApplication.run(PlantifyApplication.class, args);
+	}
+
+	@Bean
+	public LocaleResolver localeResolver() {
+		AcceptHeaderLocaleResolver resolver = new AcceptHeaderLocaleResolver();
+		resolver.setDefaultLocale(Locale.ENGLISH);
+		return resolver;
+	}
+
+	@Bean
+	public MessageSource messageSource() {
+
+		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+		messageSource.setBasename("messages");
+		messageSource.setDefaultEncoding("UTF-8");
+		messageSource.setFallbackToSystemLocale(false);
+		return messageSource;
 	}
 
 }
