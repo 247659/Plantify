@@ -22,6 +22,8 @@ public class PlantifyApplication {
 		System.setProperty("PLANT_NET_API_KEY", dotenv.get("PLANT_NET_API_KEY"));
 		System.setProperty("GROQ_API_KEY", dotenv.get("GROQ_API_KEY"));
 		System.setProperty("GROQCHAT_API_KEY", dotenv.get("GROQCHAT_API_KEY"));
+		System.setProperty("DEEPL_API_KEY", dotenv.get("DEEPL_API_KEY"));
+		System.setProperty("DEEPL_API_URL", dotenv.get("DEEPL_API_URL"));
 		System.out.println(dotenv.get("PLANT_NET_API_KEY"));
 
 		SpringApplication.run(PlantifyApplication.class, args);

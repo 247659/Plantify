@@ -10,6 +10,7 @@ import project.plantify.guide.exceptions.NotFoundSpeciesException;
 import project.plantify.guide.exceptions.PerenualApiException;
 import project.plantify.guide.playloads.response.*;
 import project.plantify.guide.services.GuideService;
+import project.plantify.translation.service.TranslationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,9 @@ public class GuideController {
 
     @Autowired
     private GuideService guideService;
+
+    @Autowired
+    private TranslationService translationService;
 
     @GetMapping("/getAll")
     public ResponseEntity<List<PlantsResponseToFrontend>> getAllPlants(@RequestHeader(name = "Accept-Language", required = false) Locale locale) {
@@ -39,10 +43,12 @@ public class GuideController {
     }
 
     @GetMapping("/getSinglePlant")
-    public ResponseEntity<SinglePlantResponseToFrontend> getSinglePlant(@RequestParam("id") String id,
+    public void getSinglePlant(@RequestParam("id") String id,
                                                                         @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
-        SinglePlantResponseToFrontend response = this.guideService.getSinglePlant(id, locale);
-        return ResponseEntity.ok(response);
+        System.out.println(translationService.translate("World", "en", locale.getLanguage()));
+        //
+//        SinglePlantResponseToFrontend response = this.guideService.getSinglePlant(id, locale);
+//        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/getPlantsGuide")
