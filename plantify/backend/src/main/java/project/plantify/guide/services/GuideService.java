@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import project.plantify.guide.exceptions.NotFoundSpeciesException;
 import project.plantify.guide.exceptions.PerenualApiException;
 import project.plantify.guide.playloads.response.*;
+import project.plantify.translation.service.TranslationService;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
@@ -28,6 +29,9 @@ public class GuideService {
 
     @Autowired
     private  MessageSource messageSource;
+
+    @Autowired
+    private TranslationService translationService;
 
     @Value("${plant.api.token}")
     private String apiToken;
@@ -45,18 +49,23 @@ public class GuideService {
                 .block();
 
         if (Objects.requireNonNull(plants).getData().isEmpty()) {
-            throw new NotFoundSpeciesException(messageSource.getMessage("error.noPlants", null, locale));
+            throw new NotFoundSpeciesException(messageSource.getMessage("error.noPlant", null, locale));
         }
 
         return preparePlantsForFronted(Objects.requireNonNull(plants).getData());
     }
 
     public List<PlantsResponseToFrontend> getAllPlantsBySpecies(String species, Locale locale) {
+        if (locale.getLanguage().equalsIgnoreCase("pl")) {
+            species = translationService.translate(species, "pl", "en-US");
+        }
+
+        String finalSpecies = species;
         PlantsResponse plants = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v2/species-list")
                         .queryParam("key", apiToken)
-                        .queryParam("q", species)
+                        .queryParam("q", finalSpecies)
                         .build())
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError, response ->
