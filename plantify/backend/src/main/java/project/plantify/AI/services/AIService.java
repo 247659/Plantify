@@ -2,6 +2,7 @@ package project.plantify.AI.services;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -13,10 +14,18 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import project.plantify.AI.exceptions.*;
 import project.plantify.AI.payloads.request.PhotoRequest;
+import project.plantify.AI.payloads.request.PhotoUrlRequest;
 import project.plantify.AI.payloads.response.PhotoAnalysisResponse;
 import reactor.core.publisher.Mono;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.springframework.http.HttpStatus.*;
@@ -31,6 +40,46 @@ public class AIService {
         this.webClient = webClient;
         this.apiKey = apiKey;
     }
+
+    public PhotoAnalysisResponse analyzePhotoUrl(PhotoUrlRequest photoRequest) {
+        URL url = photoRequest.getUrl();
+
+        Map<String, String> FORMAT_TO_MIME = Map.of(
+                "png", MediaType.IMAGE_PNG_VALUE,
+                "jpg", MediaType.IMAGE_JPEG_VALUE,
+                "jpeg", MediaType.IMAGE_JPEG_VALUE
+        );
+
+        String path = url.getPath().toLowerCase();
+        String extension = path.substring(path.lastIndexOf('.') + 1);
+        String contentType = FORMAT_TO_MIME.get(extension);
+
+        if (contentType == null) {
+            throw new IllegalArgumentException("Nieobsługiwany format: " + extension);
+        }
+
+        try {
+            BufferedImage image = ImageIO.read(url);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ImageIO.write(image, extension, outputStream);
+            byte[] imageBytes = outputStream.toByteArray();
+            ByteArrayResource imageResource = new ByteArrayResource(imageBytes) {
+                @Override
+                public String getFilename() {
+                    return "image." + extension;
+                }
+            };
+
+            MultipartBodyBuilder builder = new MultipartBodyBuilder();
+            builder.part("images", imageResource).filename(imageResource.getFilename());
+            builder.part("organs", photoRequest.getOrgans());
+
+            return sendRequestToAPI(builder, photoRequest.getLang());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public PhotoAnalysisResponse analyzePhoto(List<MultipartFile> images, PhotoRequest request) {
         if (images.getFirst().getContentType() == null || images.isEmpty()) {
