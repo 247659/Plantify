@@ -32,6 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "plant.api.token=test_api_token",
                 "plant.net.api.key=test_net_api_key",
                 "groq.api.key=test_groq_api_key",
+                "deepl.api.key=test_deepl_api_key",
+                "deepl.api.url=test_deepl_api_url"
         }
 )
 @AutoConfigureMockMvc

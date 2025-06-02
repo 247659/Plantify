@@ -111,7 +111,7 @@ public class ChatService {
         } catch (BadDataException e) {
             throw e;
         } catch (Exception e) {
-            throw new AIResponseException(messageSource.getMessage("chat.error", null, locale);
+            throw new AIResponseException(messageSource.getMessage("chat.error", null, locale));
         }
 
     }

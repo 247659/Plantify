@@ -38,7 +38,6 @@ public class PlantifyApplication {
 
 	@Bean
 	public MessageSource messageSource() {
-
 		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
 		messageSource.setBasename("messages");
 		messageSource.setDefaultEncoding("UTF-8");

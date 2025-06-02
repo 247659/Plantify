@@ -13,6 +13,7 @@ import project.plantify.AI.services.AIService;
 import project.plantify.AI.services.GroqService;
 
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -31,8 +32,9 @@ public class AIController {
     @PostMapping(value = "/getSpecies")
     public ResponseEntity<PhotoAnalysisResponseToFrontend> getSpecies(@RequestPart("images") List<MultipartFile> images,
                                                                       @RequestPart("organs") String organs,
-                                                                      @RequestPart("lang") String lang) {
-        PhotoRequest request = new PhotoRequest(organs, lang);
+                                                                      @RequestPart("lang") Locale lang,
+                                                                      @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+        PhotoRequest request = new PhotoRequest(organs, lang.getLanguage());
         PhotoAnalysisResponse response = this.aiService.analyzePhoto(images, request);
 
         if (response.getResults().getFirst().getSpecies().getCommonNames().isEmpty()) {
@@ -51,7 +53,8 @@ public class AIController {
     }
 
     @PostMapping("/getSpeciesByUrl")
-    private ResponseEntity<PhotoAnalysisResponseToFrontend> getSpeciesByUrl(@RequestBody PhotoUrlRequest request) {
+    private ResponseEntity<PhotoAnalysisResponseToFrontend> getSpeciesByUrl(@RequestBody PhotoUrlRequest request,
+                                                                            @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         PhotoAnalysisResponse response = this.aiService.analyzePhotoUrl(request);
 
         if (response.getResults().getFirst().getSpecies().getCommonNames().isEmpty()) {
