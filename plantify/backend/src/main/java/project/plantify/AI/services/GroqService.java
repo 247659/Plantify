@@ -11,8 +11,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import project.plantify.AI.payloads.response.GroqResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Setter
@@ -51,9 +53,16 @@ public class GroqService {
                 .bodyToMono(String.class);
     }
 
-    public GroqResponse generateShoppingList(String species, String language) throws Exception {
+    public List<GroqResponse> parseShoppingList(String responseText) {
+        return Arrays.stream(responseText.split("\n"))
+                .map(line -> line.replaceFirst("^\\*\\s*", ""))
+                .map(GroqResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<GroqResponse> generateShoppingList(String species, String language) throws Exception {
         String prompt;
-        if (language == "en") {
+        if (language.equals("en")) {
             prompt = String.format(
                     "You are a professional botanist. A person has a plant of the species '%s'. " +
                             "Generate a short shopping list of essential items needed to properly care for this plant. " +
@@ -61,7 +70,7 @@ public class GroqService {
                             "Format the response strictly as a concise bullet point list without extra explanations.",
                     species
             );
-        } else if (language == "pl") {
+        } else if (language.equals("pl")) {
             prompt = String.format(
                     "Jesteś profesjonalnym botanikiem. Osoba posiada roślinę gatunku '%s'. " +
                             "Wygeneruj krótką listę zakupów niezbędnych do jej prawidłowej pielęgnacji. " +
@@ -90,7 +99,6 @@ public class GroqService {
                     }
                 })
                 .block();
-
-        return new GroqResponse(responseText);
+        return parseShoppingList(responseText);
     }
 }

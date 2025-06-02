@@ -50,9 +50,8 @@ public class AIController {
     }
 
     @GetMapping(value = "/generateShoppingList")
-    public ResponseEntity<GroqResponse> generateShoppingList(@RequestParam("species") String species) throws Exception {
-        String language = "pl";
-        GroqResponse response = this.groqService.generateShoppingList(species, language);
+    public ResponseEntity<List<GroqResponse>> generateShoppingList(@RequestParam("species") String species, @RequestHeader("Lang") String lang) throws Exception {
+        List<GroqResponse> response = this.groqService.generateShoppingList(species, lang);
         return ResponseEntity.ok(response);
     }
 
