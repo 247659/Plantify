@@ -1,27 +1,42 @@
 package project.plantify.AI.controllers;
 
-import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import project.plantify.AI.payloads.response.ChatResponse;
+import project.plantify.AI.services.ChatService;
+
+import java.util.Locale;
+import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api/plantify/chat")
 public class ChatController {
 
-    private final ChatClient chatClient;
-
-    public ChatController(ChatClient.Builder builder) {
-        this.chatClient = builder.build();
-    }
+    @Autowired
+    private ChatService chatService;
 
     @PostMapping("/generate")
-    public String chat(@RequestParam("mes") String message) {
-        System.out.println("Received message: " + message);
-        return chatClient.prompt().user(message).call().content();
+    public ResponseEntity<ChatResponse> chat(@RequestBody Map<String, String> body,
+                                             @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+
+        String message = body.get("mes");
+        String userId = body.get("userId");
+        ChatResponse chatResponse = chatService.chat(message, userId, locale);
+        System.out.println("Response " + chatResponse.getContent());
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(chatResponse);
     }
 
-    @GetMapping("/stream")
-    public Flux<String> stream(@RequestParam("mes") String message) {
-        return chatClient.prompt().user(message).stream().content();
+    @DeleteMapping("/refresh")
+    public ResponseEntity<Void> refresh(@RequestParam ("userId") String userId,
+                                        @RequestHeader(name = "Accept-Language", required = false) Locale locale)
+        {
+            chatService.refresh(userId, locale);
+            return ResponseEntity.ok().build();
+        }
     }
-}

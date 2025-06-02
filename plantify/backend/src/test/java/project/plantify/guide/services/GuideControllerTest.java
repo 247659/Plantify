@@ -31,6 +31,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "supabase.jwt.secret=test_jwt_secret",
                 "plant.api.token=test_api_token",
                 "plant.net.api.key=test_net_api_key",
+                "groq.api.key=test_groq_api_key",
+                "deepl.api.key=test_deepl_api_key",
+                "deepl.api.url=test_deepl_api_url"
         }
 )
 @AutoConfigureMockMvc
@@ -115,7 +118,8 @@ class GuideControllerTest {
                 ));
 
         mockMvc.perform(get("/api/plantify/guide/getPlantsFAQ")
-                        .param("name", name))
+                        .param("name", name)
+                        .header("Accept-Language", "en"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id", is(213)))
@@ -146,7 +150,8 @@ class GuideControllerTest {
 
         String expectedError = "No plants found for the given species.";
         mockMvc.perform(get("/api/plantify/guide/getPlantsFAQ")
-                        .param("name", name))
+                        .param("name", name)
+                        .header("Accept-Language", "en"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", is(expectedError)));
     }
@@ -225,7 +230,8 @@ class GuideControllerTest {
 
         mockMvc.perform(get("/api/plantify/guide/getPlantsGuideById")
                         .param("speciesId", "183")
-                        .param("speciesName", name))
+                        .param("speciesName", name)
+                        .header("Accept-Language", "en"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("speciesId", is("183")))
@@ -311,7 +317,8 @@ class GuideControllerTest {
         String expectedError = "Guide not found for species with name " + name;
         mockMvc.perform(get("/api/plantify/guide/getPlantsGuideById")
                         .param("speciesId", "1000")
-                        .param("speciesName", name))
+                        .param("speciesName", name)
+                        .header("Accept-Language", "en"))
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", is(expectedError)));
@@ -416,7 +423,8 @@ class GuideControllerTest {
                 ));
 
         mockMvc.perform(get("/api/plantify/guide/getPlantsBySpecies")
-                        .param("species", species))
+                        .param("species", species)
+                        .header("Accept-Language", "en"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -453,7 +461,8 @@ class GuideControllerTest {
 
         String expectedError = "No plants found for the given species.";
         mockMvc.perform(get("/api/plantify/guide/getPlantsBySpecies")
-                        .param("species", species))
+                        .param("species", species)
+                        .header("Accept-Language", "en"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", is(expectedError)));
     }
@@ -624,6 +633,7 @@ class GuideControllerTest {
 
         mockMvc.perform(get("/api/plantify/guide/getSinglePlant")
                         .param("id", plantId)
+                        .header("Accept-Language", "en")
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -734,6 +744,7 @@ class GuideControllerTest {
 
         mockMvc.perform(get("/api/plantify/guide/getSinglePlant")
                         .param("id", plantId)
+                        .header("Accept-Language", "en")
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -750,7 +761,8 @@ class GuideControllerTest {
 
         String expectedError = "Failed to connect with external API. Please try again later.";
         this.mockMvc.perform(get("/api/plantify/guide/getSinglePlant")
-                .param("id", plantId))
+                        .param("id", plantId)
+                        .header("Accept-Language", "en"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message", is(expectedError)));
 
@@ -765,7 +777,8 @@ class GuideControllerTest {
 
         String expectedError = "Plant not found";
         mockMvc.perform(get("/api/plantify/guide/getSinglePlant")
-                        .param("id", plantId))
+                        .param("id", plantId)
+                        .header("Accept-Language", "en"))
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", is(expectedError)));
@@ -858,13 +871,15 @@ class GuideControllerTest {
 
         mockMvc.perform(get("/api/plantify/guide/getSinglePlant")
                         .param("id", plantId)
+                        .header("Accept-Language", "en")
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.origin").isEmpty())
                 .andExpect(jsonPath("$.dimensions").isEmpty())
                 .andExpect(jsonPath("$.sunlight").isEmpty())
-                .andExpect(jsonPath("$.wateringGeneralBenchmark").isEmpty())
+                .andExpect(jsonPath("$.wateringGeneralBenchmark.value").doesNotExist())
+                .andExpect(jsonPath("$.wateringGeneralBenchmark.unit").doesNotExist())
                 .andExpect(jsonPath("$.pruningMonth").isEmpty())
                 .andExpect(jsonPath("$.pruningCount").isEmpty())
                 .andExpect(jsonPath("$.soil").isEmpty())

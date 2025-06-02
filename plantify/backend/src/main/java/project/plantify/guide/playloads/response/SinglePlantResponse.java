@@ -59,7 +59,7 @@ public class SinglePlantResponse {
     @Setter
     public static class WateringBenchmark {
         @JsonProperty("value")
-        private Integer value;
+        private String value;
 
         @JsonProperty("unit")
         private String unit;
