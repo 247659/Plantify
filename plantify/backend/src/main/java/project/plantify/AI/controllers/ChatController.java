@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.plantify.AI.payloads.response.ChatResponse;
 import project.plantify.AI.services.ChatService;
+
+import java.util.Locale;
 import java.util.Map;
 
 @RestController
@@ -17,11 +19,12 @@ public class ChatController {
     private ChatService chatService;
 
     @PostMapping("/generate")
-    public ResponseEntity<ChatResponse> chat(@RequestBody Map<String, String> body) {
+    public ResponseEntity<ChatResponse> chat(@RequestBody Map<String, String> body,
+                                             @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
 
         String message = body.get("mes");
         String userId = body.get("userId");
-        ChatResponse chatResponse = chatService.chat(message, userId);
+        ChatResponse chatResponse = chatService.chat(message, userId, locale);
         System.out.println("Response " + chatResponse.getContent());
         return ResponseEntity
                 .ok()
@@ -30,9 +33,10 @@ public class ChatController {
     }
 
     @DeleteMapping("/refresh")
-    public ResponseEntity<Void> refresh(@RequestParam ("userId") String userId) {
-        chatService.refresh(userId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> refresh(@RequestParam ("userId") String userId,
+                                        @RequestHeader(name = "Accept-Language", required = false) Locale locale)
+        {
+            chatService.refresh(userId, locale);
+            return ResponseEntity.ok().build();
+        }
     }
-
-}

@@ -7,12 +7,15 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import project.plantify.AI.exceptions.AIResponseException;
 import project.plantify.AI.exceptions.BadDataException;
 import project.plantify.AI.payloads.response.ChatResponse;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Service
@@ -21,19 +24,22 @@ public class ChatService {
     private final ChatClient chatClient;
     private final Map<String, ChatMemory> chatMemory;
 
+    @Autowired
+    private MessageSource messageSource;
+
     public ChatService(ChatClient.Builder builder, Map<String, ChatMemory> chatMemory) {
         this.chatClient = builder.build();
         this.chatMemory = chatMemory;
     }
 
-    public ChatResponse chat(String message, String userId) {
+    public ChatResponse chat(String message, String userId, Locale locale) {
         try {
             ChatMemory singleChatMemory = getOrCreateChatMemory(userId);
 
             if (message == null || message.isEmpty()) {
-                throw new BadDataException("Message cannot be empty");
+                throw new BadDataException(messageSource.getMessage("chat.noMessage", null, locale));
             } else if (userId == null || userId.isEmpty()) {
-                throw new BadDataException("User ID cannot be empty");
+                throw new BadDataException(messageSource.getMessage("chat.noUser", null, locale));
             }
 
             if (singleChatMemory.get(userId).size() >= 10) {
@@ -53,7 +59,7 @@ public class ChatService {
                     .content();
 
             if (response == null || response.isEmpty()) {
-                throw new IllegalStateException("Response from chat client is empty");
+                throw new IllegalStateException(messageSource.getMessage("chat.noResponse", null, locale));
             }
             singleChatMemory.add(userId, new AssistantMessage(response));
 
@@ -61,7 +67,7 @@ public class ChatService {
         } catch (BadDataException e) {
             throw e;
         } catch (Exception e) {
-            throw new AIResponseException("Something gone wrong... Try again later.");
+            throw new AIResponseException(messageSource.getMessage("chat.error", null, locale));
         }
 
 
@@ -93,10 +99,10 @@ public class ChatService {
         });
     }
 
-    public void refresh(String userId) {
+    public void refresh(String userId, Locale locale) {
         try {
             if (userId == null || userId.isEmpty()) {
-                throw new BadDataException("User ID cannot be empty");
+                throw new BadDataException(messageSource.getMessage("chat.noUser", null, locale));
             }
 
             ChatMemory singleChatMemory = getOrCreateChatMemory(userId);
@@ -105,7 +111,7 @@ public class ChatService {
         } catch (BadDataException e) {
             throw e;
         } catch (Exception e) {
-            throw new AIResponseException("Something gone wrong... Try again later.");
+            throw new AIResponseException(messageSource.getMessage("chat.error", null, locale);
         }
 
     }
