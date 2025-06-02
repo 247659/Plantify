@@ -43,12 +43,13 @@ public class GuideController {
     }
 
     @GetMapping("/getSinglePlant")
-    public void getSinglePlant(@RequestParam("id") String id,
+    public ResponseEntity<SinglePlantResponseToFrontend> getSinglePlant(@RequestParam("id") String id,
                                                                         @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
-        System.out.println(translationService.translate("World", "en", locale.getLanguage()));
-        //
-//        SinglePlantResponseToFrontend response = this.guideService.getSinglePlant(id, locale);
-//        return ResponseEntity.ok(response);
+        SinglePlantResponseToFrontend response = this.guideService.getSinglePlant(id, locale);
+//        if (locale.getLanguage().equals("pl")) {
+//            response = translationService.translateSinglePlant(response, "en", locale.getLanguage());
+//        }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/getPlantsGuide")
@@ -63,10 +64,11 @@ public class GuideController {
     public ResponseEntity<PlantsGuideFrontendResponse> getPlantsGuideById(@RequestParam("speciesId") String id,
                                                                           @RequestParam("speciesName") String name,
                                                                           @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
-        System.out.println("Raz");
         PlantsGuideFrontendResponse response = this.guideService.getPlantsGuideById(id, name.toLowerCase(), locale);
-        System.out.println("Dwa");
-        return ResponseEntity.ok(response);
+//        if (locale.getLanguage().equals("pl")) {
+//            response = translationService.translateGuide(response, "en", locale.getLanguage());
+//        }
+       return ResponseEntity.ok(response);
     }
 
     @GetMapping("/getPlantsFAQ")
@@ -74,7 +76,9 @@ public class GuideController {
                                                                         @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
 
         List<PlantsFAQFrontendResponse> response = this.guideService.getPlantsFAQ(name.toLowerCase(), locale);
-        System.out.println(response);
+//        if (locale.getLanguage().equals("pl")) {
+//            response = translationService.translateFAQ(response, "en", locale.getLanguage());
+//        }
         return ResponseEntity.ok(response);
     }
 
