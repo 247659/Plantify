@@ -9,11 +9,14 @@ import project.plantify.AI.payloads.request.PhotoUrlRequest;
 import project.plantify.AI.payloads.response.GroqResponse;
 import project.plantify.AI.payloads.response.PhotoAnalysisResponse;
 import project.plantify.AI.payloads.response.PhotoAnalysisResponseToFrontend;
+import project.plantify.AI.payloads.response.PlantCareAdviceResponse;
 import project.plantify.AI.services.AIService;
 import project.plantify.AI.services.GroqService;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -38,16 +41,23 @@ public class AIController {
         PhotoAnalysisResponse response = this.aiService.analyzePhoto(images, request);
 
         if (response.getResults().getFirst().getSpecies().getCommonNames().isEmpty()) {
+            Mono<PlantCareAdviceResponse> plantCareAdviceResponse = groqService.getPlantAdvice(response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(), locale.getLanguage());
             PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
                     response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(),
-                    response.getResults()
+                    response.getResults(),Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization()
             );
             return ResponseEntity.ok(frontendResponse);
         }
-
+        Mono<PlantCareAdviceResponse> plantCareAdviceResponse = groqService.getPlantAdvice(response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(), locale.getLanguage());
         PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
                 response.getResults().getFirst().getSpecies().getCommonNames().getFirst(),
-                response.getResults()
+                response.getResults(), Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization()
         );
         return ResponseEntity.ok(frontendResponse);
     }
@@ -58,17 +68,27 @@ public class AIController {
         PhotoAnalysisResponse response = this.aiService.analyzePhotoUrl(request);
 
         if (response.getResults().getFirst().getSpecies().getCommonNames().isEmpty()) {
+            Mono<PlantCareAdviceResponse> plantCareAdviceResponse = groqService.getPlantAdvice(response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(), locale.getLanguage());
             PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
                     response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(),
-                    response.getResults()
+                    response.getResults(), Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization()
             );
+            System.out.println("Plant Care Advice: " + plantCareAdviceResponse.block());
             return ResponseEntity.ok(frontendResponse);
         }
 
+        Mono<PlantCareAdviceResponse> plantCareAdviceResponse = groqService.getPlantAdvice(response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(), locale.getLanguage());
         PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
                 response.getResults().getFirst().getSpecies().getCommonNames().getFirst(),
-                response.getResults()
+                response.getResults(), Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization()
         );
+        System.out.println("Plant Care Advice: " + plantCareAdviceResponse.block());
         return ResponseEntity.ok(frontendResponse);
     }
 
@@ -77,5 +97,4 @@ public class AIController {
         List<GroqResponse> response = this.groqService.generateShoppingList(species, lang);
         return ResponseEntity.ok(response);
     }
-
 }

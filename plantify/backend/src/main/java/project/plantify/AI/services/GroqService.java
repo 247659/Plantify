@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import project.plantify.AI.payloads.response.GroqResponse;
+import project.plantify.AI.payloads.response.PlantCareAdviceResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -101,4 +102,67 @@ public class GroqService {
                 .block();
         return parseShoppingList(responseText);
     }
+
+    public Mono<PlantCareAdviceResponse> getPlantAdvice(String species, String language) {
+        String prompt;
+        if (language == null || language.equals("en")) {
+            prompt = "Provide short care tips in English for the plant '" + species + "' in JSON format:\n" +
+                    "{\n  \"watering\": \"\",\n  \"sunlight\": \"\",\n  \"pruning\": \"\",\n  \"fertilization\": \"\"\n}. " +
+                    "For watering, specify the frequency; for sunlight, specify the type of light needed; " +
+                    "for pruning, specify the exact seasons; and for fertilization, specify the season and type of fertilizer. " +
+                    "Skip any additional information or comments. Respond only in JSON format.";
+
+        } else {
+            prompt = "Podaj krótkie porady pielęgnacyjne w języku polskim dla rośliny '" + species + "' w formacie JSON:\n" +
+                    "{\n  \"watering\": \"\",\n  \"sunlight\": \"\",\n  \"pruning\": \"\",\n  \"fertilization\": \"\"\n}. " +
+                    "W przypadku nawadniania określ częstotliwość, w przypadku nasłonecznienia określ jakie słońce jest " +
+                    "potrzebne, dla przycinania dokładne pory roku, a dla nawożenia pora roku i jaki nawóz" +
+                    " Pomiń wszelkie dodatkowe informacje i komentarze. Odpowiedz tylko w formacie JSON.";
+        }
+
+
+        return webClient.post()
+                .uri("/chat/completions")
+                .header("Authorization", "Bearer " + apiKey)
+                .header("Content-Type", "application/json")
+                .bodyValue(Map.of(
+                        "model", "llama-3.3-70b-versatile",
+                        "messages", List.of(Map.of(
+                                "role", "user",
+                                "content", prompt
+                        ))
+                ))
+                .retrieve()
+                .bodyToMono(Map.class)
+                .flatMap(response -> {
+                    try {
+                        // Parsowanie contentu z odpowiedzi
+                        String content = ((Map<String, String>) ((Map<String, Object>) ((List<?>) response.get("choices")).get(0)).get("message")).get("content");
+                        String cleaned = content
+                                .replaceAll("(?s)```json", "")
+                                .replaceAll("(?s)```", "")
+                                .trim();
+
+                        PlantCareAdviceResponse parsed = parseJsonContent(cleaned);
+                        return Mono.just(parsed); // <--- Mono<PlantCareAdviceResponse>
+                    } catch (Exception e) {
+                        System.err.println("Błąd parsowania JSON: " + e.getMessage());
+                        return Mono.just(new PlantCareAdviceResponse(null, null, null, null));
+                    }
+                })
+                .onErrorResume(e -> {
+                    // Obsługa błędów sieciowych, HTTP itp.
+                    System.err.println("Błąd komunikacji z Groq: " + e.getMessage());
+                    return Mono.just(new PlantCareAdviceResponse(null, null, null, null));
+                });
+    }
+
+    private PlantCareAdviceResponse parseJsonContent(String content) {
+        try {
+            return objectMapper.readValue(content, PlantCareAdviceResponse.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Błąd parsowania odpowiedzi JSON: " + content, e);
+        }
+    }
+
 }

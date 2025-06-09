@@ -1,17 +1,13 @@
 package project.plantify.AI.payloads.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.List;
-
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
-public class PhotoAnalysisResponseToFrontend {
-    private String bestMatch;
-    private List<PhotoAnalysisResponse.Result> results;
+@NoArgsConstructor
+public class PlantCareAdviceResponse {
     private String watering;
     private String sunlight;
     private String pruning;
