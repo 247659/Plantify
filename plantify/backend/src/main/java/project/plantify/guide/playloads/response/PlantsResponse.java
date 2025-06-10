@@ -19,6 +19,8 @@ public class PlantsResponse {
         private int id;
         @JsonProperty("common_name")
         private String commonName;
+        @JsonProperty("scientific_name")
+        private List<String> scientificName;
         @JsonProperty("default_image")
         private DefaultImage defaultImage;
 

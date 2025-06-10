@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import com.deepl.api.*;
 import project.plantify.guide.playloads.response.PlantsFAQFrontendResponse;
 import project.plantify.guide.playloads.response.PlantsGuideFrontendResponse;
-import project.plantify.guide.playloads.response.PlantsResponseToFrontend;
 import project.plantify.guide.playloads.response.SinglePlantResponseToFrontend;
 import project.plantify.translation.exceptions.TranslationException;
 

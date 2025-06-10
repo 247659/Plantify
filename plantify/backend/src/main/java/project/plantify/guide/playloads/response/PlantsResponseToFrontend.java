@@ -9,4 +9,5 @@ public class PlantsResponseToFrontend {
     private String id;
     private String commonName;
     private String originalUrl;
+    private String scientificName;
 }

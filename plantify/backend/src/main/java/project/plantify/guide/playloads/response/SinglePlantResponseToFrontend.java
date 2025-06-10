@@ -12,6 +12,7 @@ import java.util.List;
 public class SinglePlantResponseToFrontend {
     private int id;
     private String commonName;
+    private String scientificName;
     private String family;
     private String type;
     private List<Dimensions> dimensions;

@@ -44,20 +44,28 @@ public class AIController {
             Mono<PlantCareAdviceResponse> plantCareAdviceResponse = groqService.getPlantAdvice(response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(), locale.getLanguage());
             PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
                     response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(),
-                    response.getResults(),Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization()
+                    response.getResults(),Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_eng(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_eng(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_eng(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_eng(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_pl(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_pl(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_pl(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_pl()
             );
             return ResponseEntity.ok(frontendResponse);
         }
         Mono<PlantCareAdviceResponse> plantCareAdviceResponse = groqService.getPlantAdvice(response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(), locale.getLanguage());
         PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
                 response.getResults().getFirst().getSpecies().getCommonNames().getFirst(),
-                response.getResults(), Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization()
+                response.getResults(), Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_eng(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_eng(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_eng(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_eng(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_pl(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_pl(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_pl(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_pl()
         );
         return ResponseEntity.ok(frontendResponse);
     }
@@ -71,10 +79,14 @@ public class AIController {
             Mono<PlantCareAdviceResponse> plantCareAdviceResponse = groqService.getPlantAdvice(response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(), locale.getLanguage());
             PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
                     response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(),
-                    response.getResults(), Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization()
+                    response.getResults(), Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_eng(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_eng(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_eng(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_eng(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_pl(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_pl(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_pl(),
+                    Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_pl()
             );
             System.out.println("Plant Care Advice: " + plantCareAdviceResponse.block());
             return ResponseEntity.ok(frontendResponse);
@@ -83,10 +95,14 @@ public class AIController {
         Mono<PlantCareAdviceResponse> plantCareAdviceResponse = groqService.getPlantAdvice(response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(), locale.getLanguage());
         PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
                 response.getResults().getFirst().getSpecies().getCommonNames().getFirst(),
-                response.getResults(), Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization()
+                response.getResults(), Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_eng(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_eng(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_eng(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_eng(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_pl(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_pl(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_pl(),
+                Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_pl()
         );
         System.out.println("Plant Care Advice: " + plantCareAdviceResponse.block());
         return ResponseEntity.ok(frontendResponse);

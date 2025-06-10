@@ -201,6 +201,7 @@ public class GuideService {
         SinglePlantResponseToFrontend plantResponse = new SinglePlantResponseToFrontend();
         plantResponse.setId(plant.getId());
         plantResponse.setCommonName(plant.getCommonName());
+        plantResponse.setScientificName(plant.getScientificName().getFirst());
         plantResponse.setFamily(plant.getFamily());
         plantResponse.setType(plant.getType());
 
@@ -300,6 +301,7 @@ public class GuideService {
         PlantsResponseToFrontend plantResponse = new PlantsResponseToFrontend();
         plantResponse.setId(String.valueOf(plant.getId()));
         plantResponse.setCommonName(plant.getCommonName());
+        plantResponse.setScientificName(plant.getScientificName().getFirst());
         if (plant.getDefaultImage() != null) {
             plantResponse.setOriginalUrl(plant.getDefaultImage().getOriginalUrl());
         } else {

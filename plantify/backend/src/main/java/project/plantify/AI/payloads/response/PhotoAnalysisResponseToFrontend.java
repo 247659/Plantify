@@ -12,8 +12,12 @@ import java.util.List;
 public class PhotoAnalysisResponseToFrontend {
     private String bestMatch;
     private List<PhotoAnalysisResponse.Result> results;
-    private String watering;
-    private String sunlight;
-    private String pruning;
-    private String fertilization;
+    private String watering_eng;
+    private String sunlight_eng;
+    private String pruning_eng;
+    private String fertilization_eng;
+    private String watering_pl;
+    private String sunlight_pl;
+    private String pruning_pl;
+    private String fertilization_pl;
 }

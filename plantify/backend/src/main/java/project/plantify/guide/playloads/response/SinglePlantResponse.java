@@ -20,6 +20,9 @@ public class SinglePlantResponse {
     @JsonProperty("common_name")
     private String commonName;
 
+    @JsonProperty("scientific_name")
+    private List<String> scientificName;
+
     @JsonProperty("family")
     private String family;
 

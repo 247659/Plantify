@@ -106,15 +106,17 @@ public class GroqService {
     public Mono<PlantCareAdviceResponse> getPlantAdvice(String species, String language) {
         String prompt;
         if (language == null || language.equals("en")) {
-            prompt = "Provide short care tips in English for the plant '" + species + "' in JSON format:\n" +
-                    "{\n  \"watering\": \"\",\n  \"sunlight\": \"\",\n  \"pruning\": \"\",\n  \"fertilization\": \"\"\n}. " +
+            prompt = "Provide short care tips in English and Polish for the plant '" + species + "' in JSON format:\n" +
+                    "{\n  \"watering_eng\": \"\",\n  \"sunlight_eng\": \"\",\n  \"pruning_eng\": \"\",\n  \"fertilization_eng\": \"\"\n," +
+                    " \n  \"watering_pl\": \"\",\n  \"sunlight_pl\": \"\",\n  \"pruning_pl\": \"\",\n  \"fertilization_pl\": \"\"\n}. " +
                     "For watering, specify the frequency; for sunlight, specify the type of light needed; " +
                     "for pruning, specify the exact seasons; and for fertilization, specify the season and type of fertilizer. " +
                     "Skip any additional information or comments. Respond only in JSON format.";
 
         } else {
-            prompt = "Podaj krótkie porady pielęgnacyjne w języku polskim dla rośliny '" + species + "' w formacie JSON:\n" +
-                    "{\n  \"watering\": \"\",\n  \"sunlight\": \"\",\n  \"pruning\": \"\",\n  \"fertilization\": \"\"\n}. " +
+            prompt = "Podaj krótkie porady pielęgnacyjne w języku polskim i angielskim dla rośliny '" + species + "' w formacie JSON:\n" +
+                    "{\n  \"watering_eng\": \"\",\n  \"sunlight_eng\": \"\",\n  \"pruning_eng\": \"\",\n  \"fertilization_eng\": \"\"\n," +
+                    " \n  \"watering_pl\": \"\",\n  \"sunlight_pl\": \"\",\n  \"pruning_pl\": \"\",\n  \"fertilization_pl\": \"\"\n}. " +
                     "W przypadku nawadniania określ częstotliwość, w przypadku nasłonecznienia określ jakie słońce jest " +
                     "potrzebne, dla przycinania dokładne pory roku, a dla nawożenia pora roku i jaki nawóz" +
                     " Pomiń wszelkie dodatkowe informacje i komentarze. Odpowiedz tylko w formacie JSON.";
@@ -147,13 +149,13 @@ public class GroqService {
                         return Mono.just(parsed); // <--- Mono<PlantCareAdviceResponse>
                     } catch (Exception e) {
                         System.err.println("Błąd parsowania JSON: " + e.getMessage());
-                        return Mono.just(new PlantCareAdviceResponse(null, null, null, null));
+                        return Mono.just(new PlantCareAdviceResponse(null, null, null, null, null, null, null, null));
                     }
                 })
                 .onErrorResume(e -> {
                     // Obsługa błędów sieciowych, HTTP itp.
                     System.err.println("Błąd komunikacji z Groq: " + e.getMessage());
-                    return Mono.just(new PlantCareAdviceResponse(null, null, null, null));
+                    return Mono.just(new PlantCareAdviceResponse(null, null, null, null, null, null, null, null));
                 });
     }
 
