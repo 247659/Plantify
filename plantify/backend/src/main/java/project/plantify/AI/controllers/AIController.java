@@ -113,4 +113,14 @@ public class AIController {
         List<GroqResponse> response = this.groqService.generateShoppingList(species, lang);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/tips")
+    public ResponseEntity<PlantCareAdviceResponse> getTips(@RequestHeader(name = "Accept-Language", required = false) Locale locale,
+                                          @RequestParam(value = "species") String species) {
+
+        Mono<PlantCareAdviceResponse> plantCareAdviceResponse = groqService.getPlantAdvice(species, locale.getLanguage());
+        System.out.println("Plant Care Advice: " + plantCareAdviceResponse.block());
+        return ResponseEntity.ok(plantCareAdviceResponse.block());
+    }
+
 }

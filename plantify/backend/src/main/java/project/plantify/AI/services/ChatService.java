@@ -52,7 +52,7 @@ public class ChatService {
 //            System.out.println(singleChatMemory.get(userId).getFirst().getText());
             System.out.println("Received message: " + message);
 
-            String prompt = buildPrompt(singleChatMemory.get(userId));
+            String prompt = buildPrompt(singleChatMemory.get(userId), locale);
 //            System.out.println(prompt);
             String response = chatClient.prompt().user(prompt)
                     .call()
@@ -73,8 +73,24 @@ public class ChatService {
 
     }
 
-    private String buildPrompt(List<Message> messages) {
+    private String buildPrompt(List<Message> messages, Locale locale) {
         StringBuilder prompt = new StringBuilder();
+
+        if (locale.getLanguage().equals("pl")) {
+            prompt.append("""
+                    Jesteś ekspertem w dziedzinie roślin, botaniki i ogrodnictwa. \
+                    Pomagasz użytkownikom pielęgnować ich rośliny, diagnozować ich problemy i doradzać w zakresie ogrodnictwa.
+                    
+                    """);
+        } else {
+            prompt.append("""
+                    You are an expert in plants, botany, and gardening. \
+                    You help users care for their plants, diagnose their problems, and provide gardening advice.
+                    
+                    """);
+        }
+
+
 
         for (Message message : messages) {
             System.out.println(message);

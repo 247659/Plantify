@@ -111,7 +111,8 @@ public class GroqService {
                     " \n  \"watering_pl\": \"\",\n  \"sunlight_pl\": \"\",\n  \"pruning_pl\": \"\",\n  \"fertilization_pl\": \"\"\n}. " +
                     "For watering, specify the frequency; for sunlight, specify the type of light needed; " +
                     "for pruning, specify the exact seasons; and for fertilization, specify the season and type of fertilizer. " +
-                    "Skip any additional information or comments. Respond only in JSON format.";
+                    "Skip any additional information or comments. Respond only in JSON format. If" +
+                    " the provided species is not recognized, return an empty JSON object: {}.";
 
         } else {
             prompt = "Podaj krótkie porady pielęgnacyjne w języku polskim i angielskim dla rośliny '" + species + "' w formacie JSON:\n" +
@@ -119,7 +120,8 @@ public class GroqService {
                     " \n  \"watering_pl\": \"\",\n  \"sunlight_pl\": \"\",\n  \"pruning_pl\": \"\",\n  \"fertilization_pl\": \"\"\n}. " +
                     "W przypadku nawadniania określ częstotliwość, w przypadku nasłonecznienia określ jakie słońce jest " +
                     "potrzebne, dla przycinania dokładne pory roku, a dla nawożenia pora roku i jaki nawóz" +
-                    " Pomiń wszelkie dodatkowe informacje i komentarze. Odpowiedz tylko w formacie JSON.";
+                    " Pomiń wszelkie dodatkowe informacje i komentarze. Odpowiedz tylko w formacie JSON. " +
+                    "Jeśli przekazany gatunek nie jest rozpoznawalny, zwróć pusty obiekt JSON: {}. ";
         }
 
 
