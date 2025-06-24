@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -325,6 +326,28 @@ class GuideControllerTest {
     }
 
     @Test
+    void getPlantsGuideByIdIntervalServerError() throws Exception {
+        String name = "strawberry";
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/species-care-guide-list"))
+                .withQueryParam("key", WireMock.matching(".*"))
+                .withQueryParam("q", WireMock.equalTo(name))
+                .willReturn(aResponse()
+                        .withStatus(500) // tu zwracamy błąd 500
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"error\":\"Internal Server Error\"}")
+                ));
+
+        String expectedError = "Failed to connect with external API. Please try again later.";
+        mockMvc.perform(get("/api/plantify/guide/getPlantsGuideById")
+                        .param("speciesId", "1000")
+                        .param("speciesName", name)
+                        .header("Accept-Language", "en"))
+                .andDo(print())
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message", is(expectedError)));
+    }
+
+    @Test
     void shouldGetPlantsBySpecies() throws Exception {
         String species = "banana";
         WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/v2/species-list"))
@@ -431,11 +454,11 @@ class GuideControllerTest {
                 .andExpect(jsonPath("$[0].id", is("184")))
                 .andExpect(jsonPath("$[0].commonName", is("Common Paw Paw")))
                 .andExpect(jsonPath("$[0].originalUrl").value("https://perenual.com/storage/species_image/184_asimina_triloba/og/36488336082_9d0132fcd0_b.jpg"))
-                .andExpect(jsonPath("$[0].*", hasSize(3)))
+                .andExpect(jsonPath("$[0].*", hasSize(4)))
                 .andExpect(jsonPath("$[1].id", is("1596")))
                 .andExpect(jsonPath("$[1].commonName", is("sweet pepper")))
                 .andExpect(jsonPath("$[1].originalUrl").value("https://perenual.com/storage/species_image/1596_capsicum_annuum_bananarama/og/52253428433_0748cd6ff6_b.jpg"))
-                .andExpect(jsonPath("$[0].*", hasSize(3)));
+                .andExpect(jsonPath("$[0].*", hasSize(4)));
     }
 
     @Test
@@ -464,6 +487,26 @@ class GuideControllerTest {
                         .param("species", species)
                         .header("Accept-Language", "en"))
                 .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(expectedError)));
+    }
+
+    @Test
+    void getPlantBySpeciesIntervalServerError() throws Exception {
+        String species = "banana";
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/v2/species-list"))
+                .withQueryParam("key", WireMock.matching(".*"))
+                .withQueryParam("q", WireMock.equalTo(species))
+                .willReturn(aResponse()
+                        .withStatus(500) // tu zwracamy błąd 500
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"error\":\"Internal Server Error\"}")
+                ));
+
+        String expectedError = "Failed to connect with external API. Please try again later.";
+        mockMvc.perform(get("/api/plantify/guide/getPlantsBySpecies")
+                        .param("species", species)
+                        .header("Accept-Language", "en"))
+                .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message", is(expectedError)));
     }
 

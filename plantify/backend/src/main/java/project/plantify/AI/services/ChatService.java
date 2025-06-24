@@ -48,12 +48,9 @@ public class ChatService {
 
             singleChatMemory.add(userId, new UserMessage(message));
 
-//            System.out.println(singleChatMemory.get(userId).getFirst().getMessageType());
-//            System.out.println(singleChatMemory.get(userId).getFirst().getText());
             System.out.println("Received message: " + message);
 
             String prompt = buildPrompt(singleChatMemory.get(userId), locale);
-//            System.out.println(prompt);
             String response = chatClient.prompt().user(prompt)
                     .call()
                     .content();
