@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "327402471078",
+    "project_id": "frontend-v1j2ba",
+    "storage_bucket": "frontend-v1j2ba.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:327402471078:android:c5fe2b85d5aaaaedc73e67",
+        "android_client_info": {
+          "package_name": "project.plantify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "327402471078-47r6hmlq6njr9kmhhldlr5vl70elv0g9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "project.plantify",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "327402471078-eipslg2g349mmeje3e7a7fhjcpkpl6pc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBslI1cXo4YtUOoXqFf5WgPlXJcUkbItxM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "327402471078-eipslg2g349mmeje3e7a7fhjcpkpl6pc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "327402471078-tdefi4hb89nsjg04hno2k73qbgnuetrh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "project.plantify"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
