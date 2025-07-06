@@ -57,17 +57,6 @@ class PlantTipsControllerTest {
 
     private static final String TEST_SPECIES = "rose";
 
-    @BeforeAll
-    static void setupWireMock() {
-        wireMockServer = new WireMockServer(8080);
-        wireMockServer.start();
-        WireMock.configureFor("localhost", 8080);
-    }
-
-    @AfterAll
-    static void tearDownWireMock() {
-        wireMockServer.stop();
-    }
 
     @Test
     void getTips_shouldReturnPlantAdvice() throws Exception {
