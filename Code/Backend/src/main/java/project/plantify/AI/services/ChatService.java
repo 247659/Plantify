@@ -42,13 +42,17 @@ public class ChatService {
                 throw new BadDataException(messageSource.getMessage("chat.noUser", null, locale));
             }
 
-            if (singleChatMemory.get(userId).size() >= 10) {
-                singleChatMemory.get(userId).removeFirst();
-            }
 
             singleChatMemory.add(userId, new UserMessage(message));
 
-            System.out.println("Received message: " + message);
+            List<Message> currentMessages = singleChatMemory.get(userId);
+
+            if (currentMessages.size() >= 10) {
+                singleChatMemory.clear(userId);
+                currentMessages.subList(currentMessages.size() - 9, currentMessages.size())
+                        .forEach(msg -> singleChatMemory.add(userId, msg));
+            }
+
 
             String prompt = buildPrompt(singleChatMemory.get(userId), locale);
             String response = chatClient.prompt().user(prompt)
@@ -61,7 +65,7 @@ public class ChatService {
             singleChatMemory.add(userId, new AssistantMessage(response));
 
             return new ChatResponse("assistant", response);
-        } catch (BadDataException e) {
+        } catch (BadDataException | IllegalStateException e) {
             throw e;
         } catch (Exception e) {
             throw new AIResponseException(messageSource.getMessage("chat.error", null, locale));
@@ -90,7 +94,7 @@ public class ChatService {
 
 
         for (Message message : messages) {
-            System.out.println(message);
+//            System.out.println(message);
             if (message.getMessageType() == MessageType.USER) {
                 prompt.append("User: ").append(message.getText()).append("\n");
             } else if (message.getMessageType() == MessageType.ASSISTANT) {
@@ -127,6 +131,10 @@ public class ChatService {
             throw new AIResponseException(messageSource.getMessage("chat.error", null, locale));
         }
 
+    }
+
+    public ChatMemory getOrCreateChatMemoryTest(String sessionId) {
+        return getOrCreateChatMemory(sessionId);
     }
 
 }

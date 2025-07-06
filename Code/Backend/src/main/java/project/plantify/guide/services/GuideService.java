@@ -36,24 +36,27 @@ public class GuideService {
     @Value("${plant.api.token}")
     private String apiToken;
 
-    public List<PlantsResponseToFrontend> getAllPlant(Locale locale) {
-        PlantsResponse plants =  webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/v2/species-list")
-                        .queryParam("k", apiToken)
-                        .build())
-                .retrieve()
-                .onStatus(HttpStatusCode::is5xxServerError, response ->
-                        Mono.error(new PerenualApiException(messageSource.getMessage("error.failedConnection", null, locale))))
-                .bodyToMono(PlantsResponse.class)
-                .block();
-
-        if (Objects.requireNonNull(plants).getData().isEmpty()) {
-            throw new NotFoundSpeciesException(messageSource.getMessage("error.noPlant", null, locale));
-        }
-
-        return preparePlantsForFronted(Objects.requireNonNull(plants).getData());
-    }
+    /**
+     Nigdzie nie wykorzystywane, ale zostawiam na przyszłość
+     */
+//    public List<PlantsResponseToFrontend> getAllPlant(Locale locale) {
+//        PlantsResponse plants =  webClient.get()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path("/v2/species-list")
+//                        .queryParam("k", apiToken)
+//                        .build())
+//                .retrieve()
+//                .onStatus(HttpStatusCode::is5xxServerError, response ->
+//                        Mono.error(new PerenualApiException(messageSource.getMessage("error.failedConnection", null, locale))))
+//                .bodyToMono(PlantsResponse.class)
+//                .block();
+//
+//        if (Objects.requireNonNull(plants).getData().isEmpty()) {
+//            throw new NotFoundSpeciesException(messageSource.getMessage("error.noPlant", null, locale));
+//        }
+//
+//        return preparePlantsForFronted(Objects.requireNonNull(plants).getData());
+//    }
 
     public List<PlantsResponseToFrontend> getAllPlantsBySpecies(String species, Locale locale) {
         if (locale.getLanguage().equalsIgnoreCase("pl")) {
