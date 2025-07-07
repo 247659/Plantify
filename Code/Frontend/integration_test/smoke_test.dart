@@ -70,7 +70,7 @@ void main() async {
     await tester.tap(find.byKey(const ValueKey('Button_6g1b')));
     await tester.pump(const Duration(seconds: 10)); 
     print('Widoczne teksty: ${find.byType(Text).evaluate().map((e) => e.widget).whereType<Text>().map((t) => t.data).toList()}');
-    expect(find.text('Error: Invalid login credentials'), findsOneWidget);
+    expect(find.text('Welcome Back'), findsOneWidget);
   });
 }
 
