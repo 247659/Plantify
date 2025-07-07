@@ -1,0 +1,1 @@
+ C:\\Users\\Dominik\\Studia\\Plantify\\Code\\Frontend\\.dart_tool\\flutter_build\\bb8e905faf13142cd906251aaabba6c4\\dart_build_result.json: 
