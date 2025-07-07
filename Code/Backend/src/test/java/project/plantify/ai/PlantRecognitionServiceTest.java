@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
                 "spring.jpa.hibernate.ddl-auto=create-drop",
                 "supabase.jwt.secret=test_jwt_secret",
                 "plant.api.token=test_api_token",
+                "plant.net.api.key=test_net_api_key",
                 "groq.api.key=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",
                 "deepl.api.key=test_deepl_api_key",
                 "deepl.api.url=test_deepl_api_url"

@@ -55,13 +55,13 @@ public class GuideController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/getPlantsGuide")
-    public ResponseEntity<List<PlantsGuideFrontendResponse>> getPlantsGuide(@RequestParam("name") String name,
-                                                                            @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
-        List<PlantsGuideFrontendResponse> response = this.guideService.getPlantsGuide(name.toLowerCase(), locale);
-        System.out.println(response);
-        return ResponseEntity.ok(response);
-    }
+//    @GetMapping("/getPlantsGuide")
+//    public ResponseEntity<List<PlantsGuideFrontendResponse>> getPlantsGuide(@RequestParam("name") String name,
+//                                                                            @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+//        List<PlantsGuideFrontendResponse> response = this.guideService.getPlantsGuide(name.toLowerCase(), locale);
+//        System.out.println(response);
+//        return ResponseEntity.ok(response);
+//    }
 
     @GetMapping("/getPlantsGuideById")
     public ResponseEntity<PlantsGuideFrontendResponse> getPlantsGuideById(@RequestParam("speciesId") String id,
