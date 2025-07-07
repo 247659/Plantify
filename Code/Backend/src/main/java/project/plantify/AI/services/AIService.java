@@ -1,8 +1,9 @@
 package project.plantify.AI.services;
 
-import org.hibernate.sql.results.spi.LoadContexts;
+import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -23,7 +24,6 @@ import project.plantify.AI.payloads.response.PhotoAnalysisResponse;
 import reactor.core.publisher.Mono;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,20 +36,27 @@ import java.util.Objects;
 import static org.springframework.http.HttpStatus.*;
 
 @Service
+@Getter
+@Setter
 public class AIService {
 
-    private final WebClient webClient;
-    private final String apiKey;
+    private WebClient webClient;
+
+    @Value("${plant.net.api.key}")
+    private String apiKey;
 
     @Autowired
     private MessageSource messageSource;
 
-    public AIService(@Qualifier("AI") WebClient webClient, @Value("${plant.net.api.key}") String apiKey) {
-        this.webClient = webClient;
-        this.apiKey = apiKey;
+    @PostConstruct
+    public void init() {
+        this.webClient = WebClient.builder()
+                .baseUrl("https://my-api.plantnet.org/v2/identify")
+                .defaultHeader("Authorization", "Bearer " + apiKey)
+                .build();
     }
 
-    public PhotoAnalysisResponse analyzePhotoUrl(PhotoUrlRequest photoRequest) {
+    public Mono<PhotoAnalysisResponse> analyzePhotoUrl(PhotoUrlRequest photoRequest) {
         URL url = photoRequest.getUrl();
 
         Map<String, String> FORMAT_TO_MIME = Map.of(
@@ -63,7 +70,7 @@ public class AIService {
         String contentType = FORMAT_TO_MIME.get(extension);
 
         if (contentType == null) {
-            throw new IllegalArgumentException("Nieobsługiwany format: " + extension);
+            throw new UnsupportedMediaTypeException("Nieobsługiwany format: " + extension);
         }
 
         try {
@@ -88,32 +95,7 @@ public class AIService {
         }
     }
 
-
-    public PhotoAnalysisResponse analyzePhoto(List<MultipartFile> images, PhotoRequest request) {
-        Locale lang = LocaleContextHolder.getLocale();
-        if (images.getFirst().getContentType() == null || images.isEmpty()) {
-            throw new EmptyImageException(messageSource.getMessage("ai.noImage", null, lang));
-        }
-        try {
-            MultipartBodyBuilder requestBuilder = buildMultipartBody(images, request.getOrgans());
-            return sendRequestToAPI(requestBuilder, request.getLang());
-        } catch (WebClientResponseException e) {
-            throw new PhotoAnalysisException(messageSource.getMessage("ai.serverError", null, lang), e);
-        }
-    }
-
-    private MultipartBodyBuilder buildMultipartBody(List<MultipartFile> images, String organs) {
-        MultipartBodyBuilder builder = new MultipartBodyBuilder();
-
-        for (MultipartFile image : images) {
-            builder.part("images", image.getResource())
-                    .filename(Objects.requireNonNull(image.getOriginalFilename()));
-        }
-        builder.part("organs", organs);
-        return builder;
-    }
-
-    private PhotoAnalysisResponse sendRequestToAPI(MultipartBodyBuilder requestBuilder, String lang) {
+    private Mono<PhotoAnalysisResponse> sendRequestToAPI(MultipartBodyBuilder requestBuilder, String lang) {
         return webClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .path("/all")
@@ -126,8 +108,7 @@ public class AIService {
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, this::handle4xxError)
                 .onStatus(HttpStatusCode::is5xxServerError, this::handle5xxError)
-                .bodyToMono(PhotoAnalysisResponse.class)
-                .block();
+                .bodyToMono(PhotoAnalysisResponse.class);
     }
 
     private Mono<? extends Throwable> handle4xxError(ClientResponse response) {

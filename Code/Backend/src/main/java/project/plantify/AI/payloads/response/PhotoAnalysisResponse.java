@@ -11,7 +11,7 @@ public class PhotoAnalysisResponse {
     private String language;
     private String preferedReferential;
     private String bestMatch;
-    private List<Result> results;
+    private Result results;
     private String version;
     private int remainingIdentificationRequests;
 

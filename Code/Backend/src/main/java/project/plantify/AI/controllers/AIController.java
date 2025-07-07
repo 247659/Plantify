@@ -1,6 +1,7 @@
 package project.plantify.AI.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import project.plantify.AI.services.AIService;
 import project.plantify.AI.services.GroqService;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -31,82 +33,40 @@ public class AIController {
     public AIController(AIService aiService) {
         this.aiService = aiService;
     }
-
-    @PostMapping(value = "/getSpecies")
-    public ResponseEntity<PhotoAnalysisResponseToFrontend> getSpecies(@RequestPart("images") List<MultipartFile> images,
-                                                                      @RequestPart("organs") String organs,
-                                                                      @RequestPart("lang") Locale lang,
-                                                                      @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
-        PhotoRequest request = new PhotoRequest(organs, lang.getLanguage());
-        PhotoAnalysisResponse response = this.aiService.analyzePhoto(images, request);
-
-        if (response.getResults().getFirst().getSpecies().getCommonNames().isEmpty()) {
-            Mono<PlantCareAdviceResponse> plantCareAdviceResponse = groqService.getPlantAdvice(response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(), locale.getLanguage());
-            PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
-                    response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(),
-                    response.getResults(),Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_eng(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_eng(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_eng(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_eng(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_pl(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_pl(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_pl(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_pl()
-            );
-            return ResponseEntity.ok(frontendResponse);
-        }
-        Mono<PlantCareAdviceResponse> plantCareAdviceResponse = groqService.getPlantAdvice(response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(), locale.getLanguage());
-        PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
-                response.getResults().getFirst().getSpecies().getCommonNames().getFirst(),
-                response.getResults(), Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_eng(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_eng(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_eng(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_eng(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_pl(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_pl(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_pl(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_pl()
-        );
-        return ResponseEntity.ok(frontendResponse);
-    }
-
     @PostMapping("/getSpeciesByUrl")
-    private ResponseEntity<PhotoAnalysisResponseToFrontend> getSpeciesByUrl(@RequestBody PhotoUrlRequest request,
-                                                                            @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
-        PhotoAnalysisResponse response = this.aiService.analyzePhotoUrl(request);
+    public Mono<ResponseEntity<PhotoAnalysisResponseToFrontend>> getSpeciesByUrl(
+            @RequestBody PhotoUrlRequest request,
+            @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
 
-        if (response.getResults().getFirst().getSpecies().getCommonNames().isEmpty()) {
-            Mono<PlantCareAdviceResponse> plantCareAdviceResponse = groqService.getPlantAdvice(response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(), locale.getLanguage());
-            PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
-                    response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(),
-                    response.getResults(), Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_eng(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_eng(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_eng(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_eng(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_pl(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_pl(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_pl(),
-                    Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_pl()
-            );
-            System.out.println("Plant Care Advice: " + plantCareAdviceResponse.block());
-            return ResponseEntity.ok(frontendResponse);
-        }
+        return aiService.analyzePhotoUrl(request)
+                .flatMap(photoResponse -> {
+                    List<PhotoAnalysisResponse.Result> results = new ArrayList<>();
+                    results.add(photoResponse.getResults());
+                    var species = results.getFirst().getSpecies();
+                    String scientificName = species.getScientificNameWithoutAuthor();
+                    String commonName = species.getCommonNames().isEmpty()
+                            ? scientificName
+                            : species.getCommonNames().getFirst();
 
-        Mono<PlantCareAdviceResponse> plantCareAdviceResponse = groqService.getPlantAdvice(response.getResults().getFirst().getSpecies().getScientificNameWithoutAuthor(), locale.getLanguage());
-        PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
-                response.getResults().getFirst().getSpecies().getCommonNames().getFirst(),
-                response.getResults(), Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_eng(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_eng(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_eng(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_eng(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getWatering_pl(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getSunlight_pl(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getPruning_pl(),
-                Objects.requireNonNull(plantCareAdviceResponse.block()).getFertilization_pl()
-        );
-        System.out.println("Plant Care Advice: " + plantCareAdviceResponse.block());
-        return ResponseEntity.ok(frontendResponse);
+                    return groqService.getPlantAdvice(scientificName, locale.getLanguage())
+                            .map(advice -> {
+                                PhotoAnalysisResponseToFrontend frontendResponse = new PhotoAnalysisResponseToFrontend(
+                                        commonName,
+                                        results,
+                                        advice.getWatering_eng(),
+                                        advice.getSunlight_eng(),
+                                        advice.getPruning_eng(),
+                                        advice.getFertilization_eng(),
+                                        advice.getWatering_pl(),
+                                        advice.getSunlight_pl(),
+                                        advice.getPruning_pl(),
+                                        advice.getFertilization_pl()
+                                );
+                                return ResponseEntity.ok(frontendResponse);
+                            });
+                });
     }
+
 
     @GetMapping(value = "/generateShoppingList")
     public ResponseEntity<List<GroqResponse>> generateShoppingList(@RequestParam("species") String species, @RequestHeader("Lang") String lang) throws Exception {
